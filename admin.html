@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background:#f4f4f4; }
+        .sidebar { width: 200px; background: #2c3e50; color: white; padding: 20px; }
+        .main { flex: 1; padding: 40px; }
+        .stat-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="sidebar"><h2>Admin Panel</h2><p>Dashboard</p><p>Verification List</p><a href="index.html" style="color:white">Logout</a></div>
+    <div class="main">
+        <h1>System Overview (30% Prototype)</h1>
+        <div style="display: flex; gap: 20px;">
+            <div class="stat-card" style="flex:1;"><h3>150</h3><p>Total Maids</p></div>
+            <div class="stat-card" style="flex:1;"><h3>12</h3><p>Pending CNIC</p></div>
+        </div>
+        <p>Admin can approve or reject maid registrations here.</p>
+    </div>
+</body>
+</html>
