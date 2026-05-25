@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | MaidEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #0062ff; --gold: #ffb400; --dark: #1a1a1a; --bg: #f4f8ff; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--dark); }
+        nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; padding: 10px 20px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .nav-btn { background: var(--primary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+        .logout-btn { background: #ff4444; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        
+        .filter-section { text-align: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 15px; max-width: 800px; margin: 0 auto 30px auto; }
+        .filter-section select { width: 200px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin: 5px; }
+        
+        .maid-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; }
+        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
+        .book-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 600; }
+        
+        #bookingModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 320px; text-align: center; }
+        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2 style="color: var(--primary); font-weight: 700; margin: 0;">Maid<span style="color: var(--gold);">Easy</span></h2>
+        <div class="nav-links">
+            <a href="mybookings.html" class="nav-btn">My Bookings</a>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <h1>Available Maids</h1>
+
+    <div class="filter-section">
+        <select id="filterLocation">
+            <option value="">All Locations</option>
+            <option value="Gulberg">Gulberg</option>
+            <option value="DHA">DHA</option>
+            <option value="Johar Town">Johar Town</option>
+        </select>
+        <select id="filterCategory">
+            <option value="">All Categories</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Cooking">Cooking</option>
+        </select>
+        <button class="book-btn" onclick="applyFilter()" style="margin:0;">Search</button>
+    </div>
+
+    <div id="maidContainer" class="maid-grid"></div>
+
+    <div id="bookingModal">
+        <div class="modal-content">
+            <h3>Book <span id="maidNameDisplay"></span></h3>
+            <input type="date" id="bookingDate">
+            <input type="time" id="bookingTime">
+            <select id="duration">
+                <option value="1">1 Hour</option>
+                <option value="2">2 Hours</option>
+                <option value="3">3 Hours</option>
+            </select>
+            <button onclick="confirmBooking()" class="book-btn" style="width:100%;">Confirm Booking</button>
+            <button onclick="closeModal()" style="width:100%; padding:10px; background:#666; color:white; border:none; border-radius:8px; margin-top:10px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = "index.html";
+        function logout() { localStorage.clear(); window.location.href = "index.html"; }
+
+        let selectedMaid = "";
+        let selectedMaidId = ""; 
+        
+        async function fetchMaids() {
+            const response = await fetch('http://localhost:5000/maids');
+            const maids = await response.json();
+            renderMaids(maids);
+        }
+
+        async function applyFilter() {
+            const location = document.getElementById('filterLocation').value;
+            const category = document.getElementById('filterCategory').value;
+            const response = await fetch(`http://localhost:5000/filter-maids?location=${location}&category=${category}`);
+            const maids = await response.json();
+            renderMaids(maids);
+        }
+
+        function renderMaids(maids) {
+            const container = document.getElementById('maidContainer');
+            container.innerHTML = maids.map(maid => `
+                <div class="card">
+                    <img src="${maid.image}" alt="${maid.name}">
+                    <h3>${maid.name}</h3>
+                    <p><strong>Location:</strong> ${maid.location || 'N/A'}</p>
+                    <p><strong>Category:</strong> ${maid.serviceCategory || 'N/A'}</p>
+                    <button class="book-btn" onclick="bookMaid('${maid.name}', '${maid._id}')">Book Now</button>
+                </div>
+            `).join('');
+        }
+
+        function bookMaid(name, id) {
+            selectedMaid = name;
+            selectedMaidId = id;
+            document.getElementById('maidNameDisplay').innerText = name;
+            document.getElementById('bookingModal').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('bookingModal').style.display = 'none'; }
+
+        async function confirmBooking() {
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const userEmail = localStorage.getItem('userEmail');
+            
+            if(!date || !time) return alert("Please select Date and Start Time!");
+
+            const response = await fetch('http://localhost:5000/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maidName: selectedMaid, maidId: selectedMaidId, date, time, duration, userEmail })
+            });
+
+            const result = await response.json();
+            alert(result.message);
+            if(response.ok) closeModal();
+        }
+
+        fetchMaids();
+    </script>
+</body>
+</html>

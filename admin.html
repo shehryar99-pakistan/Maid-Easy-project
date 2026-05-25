@@ -1,23 +1,89 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Panel</title>
+    <title>Admin Panel | MaidEasy</title>
     <style>
         body { font-family: sans-serif; margin: 0; display: flex; height: 100vh; background:#f4f4f4; }
         .sidebar { width: 200px; background: #2c3e50; color: white; padding: 20px; }
-        .main { flex: 1; padding: 40px; }
-        .stat-card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
+        .main { flex: 1; padding: 40px; overflow-y: auto; }
+        table { width: 100%; background: white; border-collapse: collapse; margin-top: 20px; border-radius: 10px; overflow: hidden; }
+        th, td { padding: 15px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { background: #f8f8f8; }
+        .approve-btn { background: #27ae60; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px; margin-right: 5px; }
+        .reject-btn { background: #e74c3c; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px; }
+        .sidebar a { display: block; color: white; text-decoration: none; margin-top: 20px; }
     </style>
 </head>
 <body>
-    <div class="sidebar"><h2>Admin Panel</h2><p>Dashboard</p><p>Verification List</p><a href="index.html" style="color:white">Logout</a></div>
-    <div class="main">
-        <h1>System Overview (30% Prototype)</h1>
-        <div style="display: flex; gap: 20px;">
-            <div class="stat-card" style="flex:1;"><h3>150</h3><p>Total Maids</p></div>
-            <div class="stat-card" style="flex:1;"><h3>12</h3><p>Pending CNIC</p></div>
-        </div>
-        <p>Admin can approve or reject maid registrations here.</p>
+    <div class="sidebar">
+        <h2>Admin Panel</h2>
+        <p>Dashboard</p>
+        <a href="#" onclick="logout()">Logout</a>
     </div>
+    <div class="main">
+        <h1>Booking Management</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>User Email</th>
+                    <th>Maid Name</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="adminBookingBody"></tbody>
+        </table>
+    </div>
+
+    <script>
+        if (localStorage.getItem('userRole') !== 'admin') {
+            window.location.href = 'login.html';
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+
+        async function fetchAllBookings() {
+            try {
+                const response = await fetch('http://localhost:5000/all-bookings');
+                const bookings = await response.json();
+                const tbody = document.getElementById('adminBookingBody');
+                
+                tbody.innerHTML = bookings.map(b => `
+                    <tr>
+                        <td>${b.userEmail}</td>
+                        <td>${b.maidName}</td>
+                        <td>${b.date}</td>
+                        <td>${b.time || 'N/A'}</td>
+                        <td>${b.duration ? b.duration + ' hrs' : 'N/A'}</td>
+                        <td><strong>${b.status}</strong></td>
+                        <td>
+                            ${b.status === 'Pending' ? `
+                                <button onclick="updateStatus('${b._id}', 'Approved')" class="approve-btn">Approve</button>
+                                <button onclick="updateStatus('${b._id}', 'Rejected')" class="reject-btn">Reject</button>
+                            ` : b.status}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { console.error("Error:", err); }
+        }
+
+        async function updateStatus(id, newStatus) {
+            await fetch('http://localhost:5000/update-booking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: newStatus })
+            });
+            alert("Booking " + newStatus + "!");
+            fetchAllBookings();
+        }
+
+        fetchAllBookings();
+    </script>
 </body>
 </html>

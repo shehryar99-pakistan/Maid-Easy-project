@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | MaidEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f8ff; padding: 20px; }
+        h1 { text-align: center; color: #0062ff; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 15px; border-bottom: 1px solid #ddd; text-align: left; }
+        th { color: #0062ff; }
+        .back-btn { display: block; margin: 20px auto; padding: 10px 20px; background: #1a1a1a; color: white; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; width: fit-content; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>My Bookings</h1>
+        <table id="bookingTable">
+            <thead>
+                <tr>
+                    <th>Maid Name</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="bookingBody"></tbody>
+        </table>
+        <a href="dashboard.html" class="back-btn">Back to Dashboard</a>
+    </div>
+
+    <script>
+        if (localStorage.getItem('isLoggedIn') !== 'true') {
+            window.location.href = "login.html";
+        }
+
+        async function fetchBookings() {
+            const userEmail = localStorage.getItem('userEmail');
+            try {
+                const response = await fetch(`http://localhost:5000/bookings?email=${userEmail}`);
+                const bookings = await response.json();
+                const tbody = document.getElementById('bookingBody');
+                
+                if (bookings.length === 0) {
+                    tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No bookings found.</td></tr>";
+                    return;
+                }
+
+                // Yahan humne check lagaya hai ke agar duration ya time na ho toh 'N/A' dikhaye
+                tbody.innerHTML = bookings.map(b => `
+                    <tr>
+                        <td>${b.maidName}</td>
+                        <td>${b.date || 'N/A'}</td>
+                        <td>${b.time || 'N/A'}</td>
+                        <td>${b.duration ? b.duration + ' hours' : 'N/A'}</td>
+                        <td>${b.status}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Error fetching bookings:", err);
+            }
+        }
+        
+        fetchBookings();
+    </script>
+</body>
+</html>
