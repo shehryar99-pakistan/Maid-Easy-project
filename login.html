@@ -69,9 +69,20 @@
                 });
 
                 const data = await response.json();
+                
                 if (response.ok) {
                     alert("Login Successful!");
-                    window.location.href = "dashboard.html";
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('userEmail', email); 
+                    
+                    // Yahan role set karna zaroori hai taake admin.html ise read kar sake
+                    if (data.role && data.role.toLowerCase() === 'admin') {
+                        localStorage.setItem('userRole', 'admin');
+                        window.location.href = "admin.html";
+                    } else {
+                        localStorage.setItem('userRole', 'user');
+                        window.location.href = "dashboard.html";
+                    }
                 } else {
                     alert(data.message || "Login Failed");
                 }

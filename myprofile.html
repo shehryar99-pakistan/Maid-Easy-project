@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Profile | MaidEasy</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f8ff; padding: 20px; }
+        .profile-card { max-width: 400px; background: white; padding: 25px; margin: 50px auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
+        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #ddd; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; background-size: cover; background-position: center; border: 2px solid #0062ff; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #0062ff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="profile-card">
+        <h2>My Profile</h2>
+        <div class="avatar" id="avatarPreview"></div>
+        <input type="file" id="picUpload" accept="image/*">
+        
+        <input type="text" id="firstName" placeholder="First Name">
+        <input type="text" id="lastName" placeholder="Last Name">
+        <input type="text" id="phone" placeholder="Phone Number">
+        <input type="text" id="address" placeholder="Address">
+        
+        <button onclick="updateProfile()">Save Changes</button>
+        <br><br>
+        <a href="dashboard.html">Back to Dashboard</a>
+    </div>
+
+    <script>
+        const email = localStorage.getItem('userEmail');
+
+        async function fetchProfile() {
+            if (!email) return;
+            const res = await fetch(`http://localhost:5000/get-profile?email=${email}`);
+            if (!res.ok) return;
+            const user = await res.json();
+            
+            document.getElementById('firstName').value = user.firstName || '';
+            document.getElementById('lastName').value = user.lastName || '';
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('address').value = user.address || '';
+            
+            if (user.profilePic) {
+                document.getElementById('avatarPreview').style.backgroundImage = `url(${user.profilePic})`;
+            }
+        }
+
+        async function updateProfile() {
+            const fileInput = document.getElementById('picUpload');
+            const file = fileInput.files[0];
+            
+            // Logic Update: Agar file select nahi ki, to null rakho taake backend use ignore kare
+            let base64Image = null;
+
+            if (file) {
+                base64Image = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            const data = {
+                email: email,
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value
+            };
+
+            // Sirf tab add karo agar image select hui hai
+            if (base64Image) {
+                data.profilePic = base64Image;
+            }
+
+            try {
+                const res = await fetch('http://localhost:5000/update-profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if(res.ok) {
+                    alert("Profile Updated Successfully!");
+                    window.location.reload();
+                } else {
+                    alert("Update Failed. Please try again.");
+                }
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Server error, make sure backend is running.");
+            }
+        }
+
+        fetchProfile();
+    </script>
+</body>
+</html>

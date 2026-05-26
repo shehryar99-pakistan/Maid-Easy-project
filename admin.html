@@ -12,6 +12,9 @@
         .approve-btn { background: #27ae60; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px; margin-right: 5px; }
         .reject-btn { background: #e74c3c; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 5px; }
         .sidebar a { display: block; color: white; text-decoration: none; margin-top: 20px; }
+        /* Naya Form Style */
+        .form-section { background: white; padding: 20px; border-radius: 10px; margin-top: 30px; }
+        .form-section input { display: block; width: 95%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -25,17 +28,24 @@
         <table>
             <thead>
                 <tr>
-                    <th>User Email</th>
-                    <th>Maid Name</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Duration</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <th>User Email</th><th>Maid Name</th><th>Date</th><th>Time</th><th>Duration</th><th>Status</th><th>Action</th>
                 </tr>
             </thead>
             <tbody id="adminBookingBody"></tbody>
         </table>
+
+        <div class="form-section">
+            <h3>Add New Maid (After  Verification)</h3>
+            <form id="addMaidForm">
+                <input type="text" id="mName" placeholder="Maid Name" required>
+                <input type="text" id="mService" placeholder="Service (e.g. Cleaning)" required>
+                <input type="text" id="mPrice" placeholder="Price" required>
+                <input type="text" id="mLocation" placeholder="Location" required>
+                <input type="text" id="mCategory" placeholder="Category" required>
+                <input type="text" id="mImage" placeholder="Image URL" required>
+                <button type="submit" class="approve-btn">Add Maid</button>
+            </form>
+        </div>
     </div>
 
     <script>
@@ -47,6 +57,32 @@
             localStorage.clear();
             window.location.href = 'index.html';
         }
+
+        // Maid Add karne ki logic
+        document.getElementById('addMaidForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const maidData = {
+                name: document.getElementById('mName').value,
+                service: document.getElementById('mService').value,
+                price: document.getElementById('mPrice').value,
+                location: document.getElementById('mLocation').value,
+                
+                image: document.getElementById('mImage').value
+            };
+
+            const res = await fetch('http://localhost:5000/admin/add-maid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(maidData)
+            });
+            
+            if(res.ok) {
+                alert("Maid added successfully!");
+                document.getElementById('addMaidForm').reset();
+            } else {
+                alert("Error adding maid");
+            }
+        });
 
         async function fetchAllBookings() {
             try {
@@ -60,7 +96,7 @@
                         <td>${b.maidName}</td>
                         <td>${b.date}</td>
                         <td>${b.time || 'N/A'}</td>
-                        <td>${b.duration ? b.duration + ' hrs' : 'N/A'}</td>
+                        <td>${b.duration ? b.duration : 'N/A'}</td>
                         <td><strong>${b.status}</strong></td>
                         <td>
                             ${b.status === 'Pending' ? `

@@ -10,6 +10,7 @@
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--dark); }
         nav { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto 30px auto; padding: 10px 20px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .nav-btn { background: var(--primary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; }
+        .profile-btn { background: #27ae60; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-right: 10px; }
         .logout-btn { background: #ff4444; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
         h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
         
@@ -21,9 +22,9 @@
         .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
         .book-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 600; }
         
-        #bookingModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        #bookingModal, #reviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 320px; text-align: center; }
-        input, select { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -31,6 +32,7 @@
     <nav>
         <h2 style="color: var(--primary); font-weight: 700; margin: 0;">Maid<span style="color: var(--gold);">Easy</span></h2>
         <div class="nav-links">
+            <a href="myprofile.html" class="profile-btn">Profile</a>
             <a href="mybookings.html" class="nav-btn">My Bookings</a>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
@@ -41,14 +43,9 @@
     <div class="filter-section">
         <select id="filterLocation">
             <option value="">All Locations</option>
-            <option value="Gulberg">Gulberg</option>
-            <option value="DHA">DHA</option>
-            <option value="Johar Town">Johar Town</option>
         </select>
         <select id="filterCategory">
             <option value="">All Categories</option>
-            <option value="Cleaning">Cleaning</option>
-            <option value="Cooking">Cooking</option>
         </select>
         <button class="book-btn" onclick="applyFilter()" style="margin:0;">Search</button>
     </div>
@@ -70,17 +67,47 @@
         </div>
     </div>
 
+    <div id="reviewModal">
+        <div class="modal-content">
+            <h3>Rate <span id="reviewMaidName"></span></h3>
+            <select id="ratingValue">
+                <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                <option value="4">⭐⭐⭐⭐ (4)</option>
+                <option value="3">⭐⭐⭐ (3)</option>
+                <option value="2">⭐⭐ (2)</option>
+                <option value="1">⭐ (1)</option>
+            </select>
+            <textarea id="reviewComment" placeholder="Write your feedback here..."></textarea>
+            <button onclick="submitReview()" class="book-btn" style="width:100%;">Submit Review</button>
+            <button onclick="closeReviewModal()" style="width:100%; padding:10px; background:#666; color:white; border:none; border-radius:8px; margin-top:10px; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
     <script>
         if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = "index.html";
         function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
         let selectedMaid = "";
         let selectedMaidId = ""; 
+        let currentReviewMaidId = "";
         
         async function fetchMaids() {
             const response = await fetch('http://localhost:5000/maids');
             const maids = await response.json();
             renderMaids(maids);
+        }
+
+        async function loadFilterOptions() {
+            try {
+                const locRes = await fetch('http://localhost:5000/locations');
+                const locations = await locRes.json();
+                const catRes = await fetch('http://localhost:5000/categories');
+                const categories = await catRes.json();
+                const locSelect = document.getElementById('filterLocation');
+                const catSelect = document.getElementById('filterCategory');
+                locations.forEach(loc => { locSelect.innerHTML += `<option value="${loc}">${loc}</option>`; });
+                categories.forEach(cat => { catSelect.innerHTML += `<option value="${cat}">${cat}</option>`; });
+            } catch (err) { console.error("Error loading filters:", err); }
         }
 
         async function applyFilter() {
@@ -97,42 +124,56 @@
                 <div class="card">
                     <img src="${maid.image}" alt="${maid.name}">
                     <h3>${maid.name}</h3>
+                    <div style="color: #ffb400; margin: 5px 0;">
+                        ${'★'.repeat(Math.round(maid.avgRating || 0))}${'☆'.repeat(5 - Math.round(maid.avgRating || 0))}
+                        <span style="color:#666; font-size:12px;">(${maid.reviewCount || 0})</span>
+                    </div>
+                    <div style="text-align: left; font-size: 0.8em; margin: 10px 0; background: #f9f9f9; padding: 10px; border-radius: 8px; max-height: 100px; overflow-y: auto;">
+                        <strong>Reviews:</strong>
+                        ${maid.reviews && maid.reviews.length > 0 ? maid.reviews.map(r => `<p style="margin:5px 0;"><em>${r.userEmail.split('@')[0]}:</em> ${r.comment}</p>`).join('') : '<p>No reviews yet.</p>'}
+                    </div>
                     <p><strong>Location:</strong> ${maid.location || 'N/A'}</p>
                     <p><strong>Category:</strong> ${maid.serviceCategory || 'N/A'}</p>
                     <button class="book-btn" onclick="bookMaid('${maid.name}', '${maid._id}')">Book Now</button>
+                    <button onclick="openReviewModal('${maid.name}', '${maid._id}')" style="background:#f4f8ff; border:1px solid var(--primary); color:var(--primary); padding:8px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer;">Give Review</button>
                 </div>
             `).join('');
         }
 
-        function bookMaid(name, id) {
-            selectedMaid = name;
-            selectedMaidId = id;
-            document.getElementById('maidNameDisplay').innerText = name;
-            document.getElementById('bookingModal').style.display = 'flex';
-        }
-
+        function bookMaid(name, id) { selectedMaid = name; selectedMaidId = id; document.getElementById('maidNameDisplay').innerText = name; document.getElementById('bookingModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('bookingModal').style.display = 'none'; }
+        
+        function openReviewModal(name, id) { currentReviewMaidId = id; document.getElementById('reviewMaidName').innerText = name; document.getElementById('reviewModal').style.display = 'flex'; }
+        function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
+
+        async function submitReview() {
+            const response = await fetch('http://localhost:5000/add-review', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maidId: currentReviewMaidId, userEmail: localStorage.getItem('userEmail'), rating: document.getElementById('ratingValue').value, comment: document.getElementById('reviewComment').value })
+            });
+            if(response.ok) { alert("Review Submitted!"); closeReviewModal(); fetchMaids(); }
+            else { alert("Error submitting review."); }
+        }
 
         async function confirmBooking() {
             const date = document.getElementById('bookingDate').value;
             const time = document.getElementById('bookingTime').value;
             const duration = parseInt(document.getElementById('duration').value);
             const userEmail = localStorage.getItem('userEmail');
-            
             if(!date || !time) return alert("Please select Date and Start Time!");
-
             const response = await fetch('http://localhost:5000/book', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ maidName: selectedMaid, maidId: selectedMaidId, date, time, duration, userEmail })
             });
-
             const result = await response.json();
             alert(result.message);
             if(response.ok) closeModal();
         }
 
         fetchMaids();
+        loadFilterOptions();
     </script>
 </body>
 </html>
