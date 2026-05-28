@@ -20,6 +20,7 @@
         .logo-text { font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: -1px; }
         .logo-text span { color: var(--gold); }
         .login-btn { background: var(--primary); color: white; padding: 10px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; }
+        .login-btn:hover { background: #004dc7; transform: translateY(-2px); }
 
         .hero { display: flex; flex-direction: column; align-items: center; padding: 40px 8%; background: var(--light); text-align: center; }
         .hero h1 { font-size: 40px; margin-bottom: 30px; }
@@ -29,6 +30,96 @@
         .working-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); border: 1px solid #eee; }
         .working-card img { width: 100%; height: 220px; object-fit: cover; background: #ddd; }
         .working-card p { padding: 18px; font-weight: 600; color: var(--primary); margin: 0; font-size: 18px; }
+
+        /* ── WHY CHOOSE US ── */
+        .why-section {
+            padding: 70px 8%;
+            background: var(--light);
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 45px;
+        }
+
+        .section-title h2 {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .section-title p { font-size: 14px; color: #888; }
+
+        .why-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .why-card {
+            padding: 32px 24px;
+            border-radius: 20px;
+            background: white;
+            text-align: center;
+            transition: 0.3s;
+            box-shadow: 0 4px 20px rgba(0,98,255,0.06);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .why-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--gold));
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .why-card:hover::before { opacity: 1; }
+
+        .why-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,98,255,0.12);
+        }
+
+        .why-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #e8f0ff, #d0e0ff);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: var(--primary);
+            margin: 0 auto 20px auto;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0,98,255,0.15);
+        }
+
+        .why-card:hover .why-icon {
+            background: linear-gradient(135deg, var(--primary), #0040cc);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .why-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .why-card p {
+            font-size: 13px;
+            color: #888;
+            line-height: 1.6;
+        }
 
         .footer { background: #f9f9f9; padding: 40px 8%; border-top: 1px solid #eee; }
         .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; }
@@ -70,6 +161,36 @@
         </div>
     </section>
 
+    <!-- WHY CHOOSE MAIDEASY -->
+    <section class="why-section">
+        <div class="section-title">
+            <h2>Why Choose <span style="color:var(--primary)">Maid</span><span style="color:var(--gold)">Easy</span></h2>
+            <p>We make finding trusted help simple, safe, and reliable</p>
+        </div>
+        <div class="why-grid">
+            <div class="why-card">
+                <div class="why-icon"><i class="fas fa-shield-alt"></i></div>
+                <h3>Verified Maids</h3>
+                <p>All maids go through background checks and document verification before joining.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon"><i class="fas fa-bolt"></i></div>
+                <h3>Instant Booking</h3>
+                <p>Book a maid in minutes — no waiting, no hassle, no phone calls needed.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon"><i class="fas fa-star"></i></div>
+                <h3>Rated & Reviewed</h3>
+                <p>Real reviews from real users to help you choose the best maid for your home.</p>
+            </div>
+            <div class="why-card">
+                <div class="why-icon"><i class="fas fa-headset"></i></div>
+                <h3>24/7 Support</h3>
+                <p>Our team is always available to help you with any issue or query anytime.</p>
+            </div>
+        </div>
+    </section>
+
     <footer class="footer">
         <div class="footer-grid">
             <div class="footer-box">
@@ -89,5 +210,6 @@
             </div>
         </div>
     </footer>
+
 </body>
 </html>

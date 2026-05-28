@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | MaidEasy</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #0062ff; --gold: #ffb400; --dark: #1a1a1a; --bg: #f4f8ff; }
         body { font-family: 'Poppins', sans-serif; background-color: var(--bg); margin: 0; padding: 20px; color: var(--dark); }
@@ -12,16 +13,265 @@
         .nav-btn { background: var(--primary); color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; }
         .profile-btn { background: #27ae60; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-right: 10px; }
         .logout-btn { background: #ff4444; color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
-        h1 { text-align: center; color: var(--primary); margin-bottom: 20px; }
-        
-        .filter-section { text-align: center; margin-bottom: 30px; background: white; padding: 20px; border-radius: 15px; max-width: 800px; margin: 0 auto 30px auto; }
-        .filter-section select { width: 200px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; margin: 5px; }
-        
-        .maid-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.05); text-align: center; }
-        .card img { width: 100%; height: 200px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
-        .book-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: 600; }
-        
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+
+        /* ── Professional Filter Section ── */
+        .filter-section {
+            max-width: 850px;
+            margin: 0 auto 40px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 98, 255, 0.08);
+            padding: 30px 40px;
+        }
+        .filter-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 18px 0;
+            text-align: center;
+        }
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 180px;
+        }
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            padding-left: 4px;
+        }
+        .filter-group select {
+            padding: 12px 16px;
+            border: 1.5px solid #e0e7ff;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--dark);
+            background: #f8faff;
+            outline: none;
+            cursor: pointer;
+            transition: border 0.2s, box-shadow 0.2s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%230062ff' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+        .filter-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 98, 255, 0.1);
+            background-color: white;
+        }
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: 0.3s;
+            align-self: flex-end;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .search-btn:hover {
+            background: #004dc7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 98, 255, 0.3);
+        }
+
+        /* ── UPDATED: Professional Maid Cards ── */
+        .maid-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 98, 255, 0.07);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0, 98, 255, 0.13);
+        }
+
+        .card-img-wrapper {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #e8f0ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+
+        .card:hover .card-img-wrapper img {
+            transform: scale(1.05);
+        }
+
+        .card-img-wrapper .no-img-icon {
+            font-size: 60px;
+            color: #c0d0ff;
+        }
+
+        .card-body {
+            padding: 18px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-body h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0 0 8px 0;
+        }
+
+        .star-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .stars {
+            color: var(--gold);
+            font-size: 15px;
+            letter-spacing: 1px;
+        }
+
+        .review-count {
+            font-size: 12px;
+            color: #999;
+            font-weight: 500;
+        }
+
+        .reviews-box {
+            background: #f4f8ff;
+            border-left: 3px solid var(--primary);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #555;
+            max-height: 80px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        .reviews-box strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 4px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reviews-box p { margin: 3px 0; }
+
+        .card-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .meta-item i {
+            color: var(--primary);
+            width: 16px;
+            font-size: 13px;
+        }
+
+        .meta-item span { font-weight: 600; color: var(--dark); }
+
+        .card-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .book-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .book-btn:hover {
+            background: #004dc7;
+            transform: translateY(-1px);
+        }
+
+        .review-btn {
+            background: white;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .review-btn:hover {
+            background: #f0f5ff;
+        }
+
+        /* ── Modals preserved ── */
         #bookingModal, #reviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 320px; text-align: center; }
         input, select, textarea { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
@@ -41,13 +291,24 @@
     <h1>Available Maids</h1>
 
     <div class="filter-section">
-        <select id="filterLocation">
-            <option value="">All Locations</option>
-        </select>
-        <select id="filterCategory">
-            <option value="">All Categories</option>
-        </select>
-        <button class="book-btn" onclick="applyFilter()" style="margin:0;">Search</button>
+        <h3>🔍 Find Your Perfect Maid</h3>
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>📍 Location</label>
+                <select id="filterLocation">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>🧹 Category</label>
+                <select id="filterCategory">
+                    <option value="">All Categories</option>
+                </select>
+            </div>
+            <button class="search-btn" onclick="applyFilter()">
+                <i class="fas fa-search"></i> Search
+            </button>
+        </div>
     </div>
 
     <div id="maidContainer" class="maid-grid"></div>
@@ -88,9 +349,9 @@
         function logout() { localStorage.clear(); window.location.href = "index.html"; }
 
         let selectedMaid = "";
-        let selectedMaidId = ""; 
+        let selectedMaidId = "";
         let currentReviewMaidId = "";
-        
+
         async function fetchMaids() {
             const response = await fetch('http://localhost:5000/maids');
             const maids = await response.json();
@@ -118,31 +379,59 @@
             renderMaids(maids);
         }
 
+        function renderStars(rating) {
+            const full = Math.round(rating || 0);
+            const empty = 5 - full;
+            return '★'.repeat(full) + '☆'.repeat(empty);
+        }
+
         function renderMaids(maids) {
             const container = document.getElementById('maidContainer');
             container.innerHTML = maids.map(maid => `
                 <div class="card">
-                    <img src="${maid.image}" alt="${maid.name}">
-                    <h3>${maid.name}</h3>
-                    <div style="color: #ffb400; margin: 5px 0;">
-                        ${'★'.repeat(Math.round(maid.avgRating || 0))}${'☆'.repeat(5 - Math.round(maid.avgRating || 0))}
-                        <span style="color:#666; font-size:12px;">(${maid.reviewCount || 0})</span>
+                    <div class="card-img-wrapper">
+                        ${maid.image
+                            ? `<img src="${maid.image}" alt="${maid.name}">`
+                            : `<i class="fas fa-user-circle no-img-icon"></i>`}
                     </div>
-                    <div style="text-align: left; font-size: 0.8em; margin: 10px 0; background: #f9f9f9; padding: 10px; border-radius: 8px; max-height: 100px; overflow-y: auto;">
-                        <strong>Reviews:</strong>
-                        ${maid.reviews && maid.reviews.length > 0 ? maid.reviews.map(r => `<p style="margin:5px 0;"><em>${r.userEmail.split('@')[0]}:</em> ${r.comment}</p>`).join('') : '<p>No reviews yet.</p>'}
+                    <div class="card-body">
+                        <h3>${maid.name}</h3>
+                        <div class="star-row">
+                            <span class="stars">${renderStars(maid.avgRating)}</span>
+                            <span class="review-count">(${maid.reviewCount || 0} reviews)</span>
+                        </div>
+                        <div class="reviews-box">
+                            <strong>💬 Reviews</strong>
+                            ${maid.reviews && maid.reviews.length > 0
+                                ? maid.reviews.map(r => `<p><em>${r.userEmail.split('@')[0]}:</em> ${r.comment}</p>`).join('')
+                                : '<p>No reviews yet.</p>'}
+                        </div>
+                        <div class="card-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>${maid.location || 'N/A'}</span>
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-broom"></i>
+                                <span>${maid.serviceCategory || 'N/A'}</span>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="book-btn" onclick="bookMaid('${maid.name}', '${maid._id}')">
+                                <i class="fas fa-calendar-check"></i> Book Now
+                            </button>
+                            <button class="review-btn" onclick="openReviewModal('${maid.name}', '${maid._id}')">
+                                <i class="fas fa-star"></i> Give Review
+                            </button>
+                        </div>
                     </div>
-                    <p><strong>Location:</strong> ${maid.location || 'N/A'}</p>
-                    <p><strong>Category:</strong> ${maid.serviceCategory || 'N/A'}</p>
-                    <button class="book-btn" onclick="bookMaid('${maid.name}', '${maid._id}')">Book Now</button>
-                    <button onclick="openReviewModal('${maid.name}', '${maid._id}')" style="background:#f4f8ff; border:1px solid var(--primary); color:var(--primary); padding:8px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer;">Give Review</button>
                 </div>
             `).join('');
         }
 
         function bookMaid(name, id) { selectedMaid = name; selectedMaidId = id; document.getElementById('maidNameDisplay').innerText = name; document.getElementById('bookingModal').style.display = 'flex'; }
         function closeModal() { document.getElementById('bookingModal').style.display = 'none'; }
-        
+
         function openReviewModal(name, id) { currentReviewMaidId = id; document.getElementById('reviewMaidName').innerText = name; document.getElementById('reviewModal').style.display = 'flex'; }
         function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
 

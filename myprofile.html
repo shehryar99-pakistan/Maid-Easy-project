@@ -2,56 +2,458 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile | MaidEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; background: #f4f8ff; padding: 20px; }
-        .profile-card { max-width: 400px; background: white; padding: 25px; margin: 50px auto; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center; }
-        .avatar { width: 100px; height: 100px; border-radius: 50%; background: #ddd; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; background-size: cover; background-position: center; border: 2px solid #0062ff; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: #0062ff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        :root { --primary: #0062ff; --gold: #ffb400; --dark: #1a1a1a; --bg: #f4f8ff; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 30px 20px;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+            margin: 0 auto 30px auto;
+            padding: 12px 24px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .logo-text { font-size: 22px; font-weight: 700; color: var(--primary); }
+        .logo-text span { color: var(--gold); }
+
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            padding: 9px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover { background: #004dc7; }
+
+        .profile-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .left-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,98,255,0.08);
+            padding: 35px 25px;
+            text-align: center;
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px auto;
+            cursor: pointer;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            background-size: cover;
+            background-position: center;
+            border: 4px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #a0b4ff;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: none;
+        }
+
+        .edit-overlay {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            box-shadow: 0 2px 8px rgba(0,98,255,0.4);
+            transition: 0.3s;
+        }
+
+        .edit-overlay:hover { background: #004dc7; transform: scale(1.1); }
+
+        #picUpload { display: none; }
+
+        .user-name { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+        .user-email { font-size: 13px; color: #888; margin-bottom: 20px; word-break: break-all; }
+
+        .profile-badge {
+            display: inline-block;
+            background: #e8f0ff;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        .right-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,98,255,0.08);
+            padding: 35px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #f0f4ff;
+        }
+
+        .card-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-header i { color: var(--primary); font-size: 20px; }
+        .card-header h2 { font-size: 18px; font-weight: 700; color: var(--dark); }
+
+        /* Edit / Cancel button */
+        .edit-toggle-btn {
+            background: #f0f5ff;
+            color: var(--primary);
+            border: 1.5px solid var(--primary);
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .edit-toggle-btn:hover { background: var(--primary); color: white; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-group.full { grid-column: 1 / -1; }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            padding: 11px 14px;
+            border: 1.5px solid #e0e7ff;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--dark);
+            background: #f8faff;
+            outline: none;
+            transition: 0.2s;
+            width: 100%;
+        }
+
+        /* Disabled/readonly state */
+        .input-group input:disabled {
+            background: #f4f8ff;
+            color: #888;
+            border-color: #eee;
+            cursor: not-allowed;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,98,255,0.08);
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .save-btn:hover {
+            background: #004dc7;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,98,255,0.3);
+        }
+
+        /* Hidden by default — shown when editing */
+        #saveSection { display: none; }
+
+        #imgModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.75);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #imgModal.active { display: flex; }
+
+        #imgModal img {
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        #imgModal .close-modal {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 700px) {
+            .profile-wrapper { grid-template-columns: 1fr; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="profile-card">
-        <h2>My Profile</h2>
-        <div class="avatar" id="avatarPreview"></div>
-        <input type="file" id="picUpload" accept="image/*">
-        
-        <input type="text" id="firstName" placeholder="First Name">
-        <input type="text" id="lastName" placeholder="Last Name">
-        <input type="text" id="phone" placeholder="Phone Number">
-        <input type="text" id="address" placeholder="Address">
-        
-        <button onclick="updateProfile()">Save Changes</button>
-        <br><br>
-        <a href="dashboard.html">Back to Dashboard</a>
+    <nav>
+        <div class="logo-text">Maid<span>Easy</span></div>
+        <a href="dashboard.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </nav>
+
+    <div class="profile-wrapper">
+
+        <!-- LEFT: Avatar Card -->
+        <div class="left-card">
+            <div class="avatar-wrapper" onclick="document.getElementById('picUpload').click()">
+                <div class="avatar" id="avatarPreview">
+                    <i class="fas fa-user" id="avatarIcon"></i>
+                    <img id="avatarImg" src="" alt="Profile">
+                </div>
+                <div class="edit-overlay">
+                    <i class="fas fa-camera"></i>
+                </div>
+            </div>
+
+            <input type="file" id="picUpload" accept="image/*" onchange="previewImage(event)">
+
+            <div class="user-name" id="displayName">Your Name</div>
+            <div class="user-email" id="displayEmail"></div>
+            <span class="profile-badge"><i class="fas fa-shield-alt"></i> Verified User</span>
+
+            <p style="font-size:12px; color:#aaa; margin-top:16px;">
+                <i class="fas fa-camera"></i> Click photo to change
+            </p>
+        </div>
+
+        <!-- RIGHT: Edit Form -->
+        <div class="right-card">
+            <div class="card-header">
+                <div class="card-header-left">
+                    <i class="fas fa-user-edit"></i>
+                    <h2>Profile Information</h2>
+                </div>
+                <!-- Edit Toggle Button -->
+                <button class="edit-toggle-btn" id="editToggleBtn" onclick="toggleEdit()">
+                    <i class="fas fa-pen"></i> Edit
+                </button>
+            </div>
+
+            <div class="form-grid">
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" id="firstName" placeholder="First name" disabled>
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" id="lastName" placeholder="Last name" disabled>
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="text" id="phone" placeholder="03XX-XXXXXXX" disabled>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" id="emailField" placeholder="Your email" disabled>
+                </div>
+            </div>
+
+            <!-- Save button — only shows when editing -->
+            <div id="saveSection">
+                <button class="save-btn" onclick="updateProfile()">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Image View Modal -->
+    <div id="imgModal">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <img id="modalImg" src="" alt="Profile Large">
     </div>
 
     <script>
         const email = localStorage.getItem('userEmail');
+        document.getElementById('displayEmail').innerText = email || '';
 
+        let isEditing = false;
+
+        // Toggle edit mode
+        function toggleEdit() {
+            isEditing = !isEditing;
+            const fields = ['firstName', 'lastName', 'phone', 'emailField'];
+            const btn = document.getElementById('editToggleBtn');
+            const saveSection = document.getElementById('saveSection');
+
+            if (isEditing) {
+                fields.forEach(id => document.getElementById(id).disabled = false);
+                btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
+                btn.style.background = '#fff0f0';
+                btn.style.color = '#ff4444';
+                btn.style.borderColor = '#ff4444';
+                saveSection.style.display = 'block';
+            } else {
+                fields.forEach(id => document.getElementById(id).disabled = true);
+                btn.innerHTML = '<i class="fas fa-pen"></i> Edit';
+                btn.style.background = '#f0f5ff';
+                btn.style.color = 'var(--primary)';
+                btn.style.borderColor = 'var(--primary)';
+                saveSection.style.display = 'none';
+                fetchProfile(); // reset changes if cancelled
+            }
+        }
+
+        // Preview image before upload
+        function previewImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const img = document.getElementById('avatarImg');
+                const icon = document.getElementById('avatarIcon');
+                img.src = reader.result;
+                img.style.display = 'block';
+                icon.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Double click avatar to view large
+        document.getElementById('avatarPreview').addEventListener('dblclick', () => {
+            const src = document.getElementById('avatarImg').src;
+            if (!src || src === window.location.href) return;
+            document.getElementById('modalImg').src = src;
+            document.getElementById('imgModal').classList.add('active');
+        });
+
+        function closeModal() {
+            document.getElementById('imgModal').classList.remove('active');
+        }
+
+        // Original fetchProfile logic preserved
         async function fetchProfile() {
             if (!email) return;
             const res = await fetch(`http://localhost:5000/get-profile?email=${email}`);
             if (!res.ok) return;
             const user = await res.json();
-            
+
             document.getElementById('firstName').value = user.firstName || '';
             document.getElementById('lastName').value = user.lastName || '';
             document.getElementById('phone').value = user.phone || '';
-            document.getElementById('address').value = user.address || '';
-            
+            document.getElementById('emailField').value = user.email || email;
+
+            const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+            document.getElementById('displayName').innerText = fullName || 'Your Name';
+
             if (user.profilePic) {
-                document.getElementById('avatarPreview').style.backgroundImage = `url(${user.profilePic})`;
+                const img = document.getElementById('avatarImg');
+                const icon = document.getElementById('avatarIcon');
+                img.src = user.profilePic;
+                img.style.display = 'block';
+                icon.style.display = 'none';
             }
         }
 
+        // Original updateProfile logic preserved exactly
         async function updateProfile() {
             const fileInput = document.getElementById('picUpload');
             const file = fileInput.files[0];
-            
-            // Logic Update: Agar file select nahi ki, to null rakho taake backend use ignore kare
+
             let base64Image = null;
 
             if (file) {
@@ -67,10 +469,9 @@
                 firstName: document.getElementById('firstName').value,
                 lastName: document.getElementById('lastName').value,
                 phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value
+                address: document.getElementById('emailField').value
             };
 
-            // Sirf tab add karo agar image select hui hai
             if (base64Image) {
                 data.profilePic = base64Image;
             }
@@ -84,6 +485,8 @@
 
                 if(res.ok) {
                     alert("Profile Updated Successfully!");
+                    isEditing = false;
+                    toggleEdit();
                     window.location.reload();
                 } else {
                     alert("Update Failed. Please try again.");

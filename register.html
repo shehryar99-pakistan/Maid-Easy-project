@@ -36,6 +36,18 @@
             <div class="input-group"> <label>Confirm Password</label> <input type="password" name="confirmPassword" id="confirmPassword" required> </div>
             <button type="submit" class="signup-btn">Sign Up</button>
         </form>
+
+        <!-- ADDED: Login link -->
+        <p style="margin-top: 15px; font-size: 13px; color: #666;">
+            Already have an account?
+            <a href="login.html" style="color: #0062ff; font-weight: 600; text-decoration: none;">Login here</a>
+        </p>
+
+        <!-- ADDED: Back to Home link -->
+        <p style="margin-top: 8px; font-size: 13px;">
+            <a href="index.html" style="color: #999; text-decoration: none;">← Back to Home</a>
+        </p>
+
     </div>
 
     <script>
@@ -62,8 +74,16 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
             });
+
             const result = await response.json();
-            alert(result.message);
+
+            // UPDATED: show proper message and redirect on success
+            if (response.ok) {
+                alert("✅ Account created successfully! Please login.");
+                window.location.href = "login.html";
+            } else {
+                alert("⚠️ " + result.message);
+            }
         });
     </script>
 </body>

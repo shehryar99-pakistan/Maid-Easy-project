@@ -4,67 +4,331 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Bookings | MaidEasy</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: #f4f8ff; 
-            padding: 20px; 
+        :root { --primary: #0062ff; --gold: #ffb400; --dark: #1a1a1a; --bg: #f4f8ff; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg);
+            min-height: 100vh;
+            padding: 30px 20px;
         }
 
-        h1 { 
-            text-align: center; 
-            color: #0062ff; 
+        /* ── NAV ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto 30px auto;
+            padding: 12px 24px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
 
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 20px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+        .logo-text { font-size: 22px; font-weight: 700; color: var(--primary); }
+        .logo-text span { color: var(--gold); }
+
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            padding: 9px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
+        .back-btn:hover { background: #004dc7; transform: translateY(-1px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            max-width: 1000px;
+            margin: 0 auto 25px auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
 
-        th, td { 
-            padding: 15px; 
-            border-bottom: 1px solid #ddd; 
-            text-align: left; 
+        .page-header h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--dark);
         }
 
-        th { 
-            color: #0062ff; 
+        .page-header h1 span { color: var(--primary); }
+
+        .booking-count {
+            background: #e8f0ff;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
         }
 
-        .back-btn { 
-            display: block; 
-            margin: 20px auto; 
-            padding: 10px 20px; 
-            background: #1a1a1a; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            text-decoration: none; 
-            width: fit-content; 
+        /* ── STATS ROW ── */
+        .stats-row {
+            max-width: 1000px;
+            margin: 0 auto 25px auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 4px 15px rgba(0,98,255,0.06);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .stat-icon.approved { background: #e6f9f0; color: #27ae60; }
+        .stat-icon.pending { background: #fff8e6; color: #f39c12; }
+        .stat-icon.rejected { background: #ffe8e8; color: #e74c3c; }
+
+        .stat-info p {
+            font-size: 12px;
+            color: #888;
+            font-weight: 500;
+        }
+
+        .stat-info h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* ── MAIN CONTAINER ── */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,98,255,0.07);
+            overflow: hidden;
+        }
+
+        .container-header {
+            padding: 20px 28px;
+            border-bottom: 2px solid #f0f4ff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .container-header i { color: var(--primary); font-size: 18px; }
+        .container-header h2 { font-size: 16px; font-weight: 700; color: var(--dark); }
+
+        /* ── TABLE ── */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #f8faff;
+        }
+
+        th {
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f0f4ff;
+        }
+
+        td {
+            padding: 16px 20px;
+            font-size: 14px;
+            color: var(--dark);
+            border-bottom: 1px solid #f5f7ff;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+        }
+
+        tbody tr:hover { background: #f8faff; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        /* Maid name with icon */
+        .maid-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .maid-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .maid-name { font-weight: 600; }
+
+        /* Date cell */
+        .date-cell {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #555;
+        }
+
+        .date-cell i { color: var(--primary); font-size: 13px; }
+
+        /* Duration badge */
+        .duration-badge {
+            background: #f0f5ff;
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-badge.approved {
+            background: #e6f9f0;
+            color: #27ae60;
+        }
+
+        .status-badge.pending {
+            background: #fff8e6;
+            color: #f39c12;
+        }
+
+        .status-badge.rejected {
+            background: #ffe8e8;
+            color: #e74c3c;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state i {
+            font-size: 50px;
+            color: #c0d0ff;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            color: #aaa;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p { font-size: 14px; color: #bbb; }
+
+        @media (max-width: 700px) {
+            .stats-row { grid-template-columns: 1fr; }
+            .page-header { flex-direction: column; gap: 10px; align-items: flex-start; }
+            td, th { padding: 12px 12px; }
         }
     </style>
 </head>
-
 <body>
 
+    <!-- NAV -->
+    <nav>
+        <div class="logo-text">Maid<span>Easy</span></div>
+        <a href="dashboard.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <h1>My <span>Bookings</span></h1>
+        <div class="booking-count" id="totalCount">0 Bookings</div>
+    </div>
+
+    <!-- STATS ROW -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon approved"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <p>Approved</p>
+                <h3 id="approvedCount">0</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
+            <div class="stat-info">
+                <p>Pending</p>
+                <h3 id="pendingCount">0</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon rejected"><i class="fas fa-times-circle"></i></div>
+            <div class="stat-info">
+                <p>Rejected</p>
+                <h3 id="rejectedCount">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOKINGS TABLE -->
     <div class="container">
-        <h1>My Bookings</h1>
+        <div class="container-header">
+            <i class="fas fa-calendar-alt"></i>
+            <h2>Booking History</h2>
+        </div>
 
         <table id="bookingTable">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Maid Name</th>
                     <th>Date</th>
                     <th>Time</th>
@@ -72,73 +336,95 @@
                     <th>Status</th>
                 </tr>
             </thead>
-
             <tbody id="bookingBody"></tbody>
         </table>
-
-        <a href="dashboard.html" class="back-btn">
-            Back to Dashboard
-        </a>
     </div>
 
     <script>
-
         // Agar user login nahi hai toh login page par redirect karo
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             window.location.href = "login.html";
         }
 
         async function fetchBookings() {
-
             const userEmail = localStorage.getItem('userEmail');
 
             try {
-
-                const response = await fetch(
-                    `http://localhost:5000/bookings?email=${userEmail}`
-                );
-
+                const response = await fetch(`http://localhost:5000/bookings?email=${userEmail}`);
                 const bookings = await response.json();
-
                 const tbody = document.getElementById('bookingBody');
+
+                // Update stats
+                document.getElementById('totalCount').innerText = bookings.length + ' Bookings';
+                document.getElementById('approvedCount').innerText = bookings.filter(b => b.status === 'Approved').length;
+                document.getElementById('pendingCount').innerText = bookings.filter(b => b.status === 'Pending').length;
+                document.getElementById('rejectedCount').innerText = bookings.filter(b => b.status === 'Rejected').length;
 
                 // Agar bookings nahi milin
                 if (bookings.length === 0) {
-
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan='5' style='text-align:center;'>
-                                No bookings found.
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <h3>No Bookings Yet</h3>
+                                    <p>You haven't made any bookings yet. Go ahead and book a maid!</p>
+                                </div>
                             </td>
-                        </tr>
-                    `;
-
+                        </tr>`;
                     return;
                 }
 
+                // FIX: duration word fix — "1 hour" not "1 hour hours"
+                function formatDuration(duration) {
+                    if (!duration) return 'N/A';
+                    // Remove any existing "hours" or "hour" from stored value
+                    const num = parseInt(duration);
+                    if (isNaN(num)) return duration;
+                    return num === 1 ? '1 Hour' : `${num} Hours`;
+                }
+
+                // Status badge helper
+                function statusBadge(status) {
+                    const s = (status || 'Pending').toLowerCase();
+                    const icons = { approved: 'fa-check-circle', pending: 'fa-clock', rejected: 'fa-times-circle' };
+                    const icon = icons[s] || 'fa-clock';
+                    return `<span class="status-badge ${s}"><i class="fas ${icon}"></i> ${status}</span>`;
+                }
+
                 // Data table me show karna
-                tbody.innerHTML = bookings.map(b => `
+                tbody.innerHTML = bookings.map((b, index) => `
                     <tr>
-                        <td>${b.maidName}</td>
-                        <td>${b.date || 'N/A'}</td>
-                        <td>${b.time || 'N/A'}</td>
+                        <td style="color:#aaa; font-size:13px;">${index + 1}</td>
                         <td>
-                            ${b.duration ? b.duration + ' hours' : 'N/A'}
+                            <div class="maid-cell">
+                                <div class="maid-avatar">${b.maidName ? b.maidName.charAt(0).toUpperCase() : 'M'}</div>
+                                <span class="maid-name">${b.maidName || 'N/A'}</span>
+                            </div>
                         </td>
-                        <td>${b.status}</td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="fas fa-calendar"></i>
+                                ${b.date || 'N/A'}
+                            </div>
+                        </td>
+                        <td>
+                            <div class="date-cell">
+                                <i class="fas fa-clock"></i>
+                                ${b.time || 'N/A'}
+                            </div>
+                        </td>
+                        <td><span class="duration-badge">${formatDuration(b.duration)}</span></td>
+                        <td>${statusBadge(b.status)}</td>
                     </tr>
                 `).join('');
 
             } catch (err) {
-
                 console.error("Error fetching bookings:", err);
-
             }
         }
 
         fetchBookings();
-
     </script>
-
 </body>
 </html>
