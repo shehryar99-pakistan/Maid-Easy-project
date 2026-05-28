@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
      password: String,
      phone: String,       
      address: String,    
-     profilePic: String, // Nayi field add ki
+     profilePic: String,
      role: { type: String, default: 'user' } 
 });
 const User = mongoose.model('User', UserSchema);
@@ -60,11 +60,21 @@ const ReviewSchema = new mongoose.Schema({
 const Review = mongoose.model('Review', ReviewSchema);
 
 // --- ROUTES ---
+// --- UPDATED: Register with duplicate email check ---
 app.post('/register', async (req, res) => {
      try {
          const { firstName, lastName, email, password } = req.body;
+
+         // Check if email already exists
+         const existingUser = await User.findOne({ email: email });
+         if (existingUser) {
+             return res.status(400).json({ 
+                 message: "An account with this email already exists. Please login instead." 
+             });
+         }
+
          await new User({ firstName, lastName, email, password }).save();
-         res.status(200).json({ message: "Account created!" });
+         res.status(200).json({ message: "Account created successfully!" });
      } catch (err) { res.status(500).json({ error: "Failed" }); }
 });
 
@@ -78,13 +88,13 @@ app.post('/login', async (req, res) => {
      }
 });
 
-// --- PROFILE ROUTES ---
+// --- PROFILE ROUTES --- (address removed, only phone kept)
 app.post('/update-profile', async (req, res) => {
     try {
-        const { email, firstName, lastName, phone, address, profilePic } = req.body;
+        const { email, firstName, lastName, phone, profilePic } = req.body;
         
-        let updateData = { firstName, lastName, phone, address };
-        if (profilePic) updateData.profilePic = profilePic; // Image save hogi
+        let updateData = { firstName, lastName, phone };
+        if (profilePic) updateData.profilePic = profilePic;
 
         await User.findOneAndUpdate(
             { email: email }, 
@@ -124,7 +134,7 @@ app.get('/maids', async (req, res) => {
              ...maid.toObject(), 
              avgRating, 
              reviewCount: reviews.length,
-             reviews: reviews // Ab reviews ka array bhi ja raha hai
+             reviews: reviews
          };
      }));
      res.status(200).json(maidsWithReviews);
@@ -199,12 +209,31 @@ app.post('/update-booking', async (req, res) => {
      res.status(200).json({ message: `Booking ${status}!` });
 });
 
+// --- FIXED: serviceCategory now saves correctly ---
 app.post('/admin/add-maid', async (req, res) => {
      try {
          const { name, service, price, location, serviceCategory, image } = req.body;
-         await new Maid({ name, service, price, location,  image }).save();
+         await new Maid({ name, service, price, location, serviceCategory, image }).save();
          res.status(200).json({ message: "Maid added successfully!" });
      } catch (err) { res.status(500).json({ error: "Failed to add maid" }); }
+});
+
+// --- NEW: ADMIN UPDATE MAID ---
+app.post('/admin/update-maid', async (req, res) => {
+    try {
+        const { id, name, service, price, location, serviceCategory, image } = req.body;
+        await Maid.findByIdAndUpdate(id, { name, service, price, location, serviceCategory, image });
+        res.status(200).json({ message: "Maid updated successfully!" });
+    } catch (err) { res.status(500).json({ error: "Update failed" }); }
+});
+
+// --- NEW: ADMIN DELETE MAID ---
+app.post('/admin/delete-maid', async (req, res) => {
+    try {
+        const { id } = req.body;
+        await Maid.findByIdAndDelete(id);
+        res.status(200).json({ message: "Maid deleted successfully!" });
+    } catch (err) { res.status(500).json({ error: "Delete failed" }); }
 });
 
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
