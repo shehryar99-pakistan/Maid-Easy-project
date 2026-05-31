@@ -30,13 +30,7 @@
             z-index: 100;
         }
 
-        .sidebar-logo {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        /* FIXED: Maid = blue, Easy = gold */
+        .sidebar-logo { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
         .sidebar-logo .maid-text { color: var(--primary); }
         .sidebar-logo .easy-text { color: var(--gold); }
 
@@ -48,12 +42,7 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .sidebar-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            flex: 1;
-        }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 6px; flex: 1; }
 
         .menu-item {
             display: flex;
@@ -73,27 +62,13 @@
             font-family: 'Poppins', sans-serif;
         }
 
-        .menu-item:hover, .menu-item.active {
-            background: rgba(255,255,255,0.08);
-            color: white;
-        }
-
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.08); color: white; }
         .menu-item.active { color: white; }
         .menu-item i { width: 18px; font-size: 15px; }
-
-        .menu-item.logout-item {
-            color: #ff6b6b;
-            margin-top: auto;
-        }
-
+        .menu-item.logout-item { color: #ff6b6b; margin-top: auto; }
         .menu-item.logout-item:hover { background: rgba(255,107,107,0.1); }
 
-        .main {
-            margin-left: 240px;
-            flex: 1;
-            padding: 30px;
-            overflow-y: auto;
-        }
+        .main { margin-left: 240px; flex: 1; padding: 30px; overflow-y: auto; }
 
         .section { display: none; }
         .section.active { display: block; }
@@ -141,11 +116,7 @@
             margin-bottom: 20px;
         }
 
-        .section-header h2 {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--dark);
-        }
+        .section-header h2 { font-size: 20px; font-weight: 700; color: var(--dark); }
 
         .card {
             background: white;
@@ -203,6 +174,7 @@
         .status-badge.approved { background: #e6f9f0; color: #27ae60; }
         .status-badge.pending { background: #fff8e6; color: #f39c12; }
         .status-badge.rejected { background: #ffe8e8; color: #e74c3c; }
+        .status-badge.completed { background: #e8f0ff; color: var(--primary); }
 
         .approve-btn {
             background: #27ae60;
@@ -235,6 +207,21 @@
 
         .reject-btn:hover { background: #c0392b; }
 
+        .cancel-btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            cursor: pointer;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: 0.2s;
+        }
+
+        .cancel-btn:hover { background: #e55a26; }
+
         .maid-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -242,23 +229,9 @@
             padding: 20px;
         }
 
-        .maid-card {
-            border: 1.5px solid #e8f0ff;
-            border-radius: 14px;
-            overflow: hidden;
-            transition: 0.3s;
-        }
-
-        .maid-card:hover {
-            box-shadow: 0 8px 24px rgba(0,98,255,0.1);
-            transform: translateY(-3px);
-        }
-
-        .maid-card img {
-            width: 100%;
-            height: 160px;
-            object-fit: cover;
-        }
+        .maid-card { border: 1.5px solid #e8f0ff; border-radius: 14px; overflow: hidden; transition: 0.3s; }
+        .maid-card:hover { box-shadow: 0 8px 24px rgba(0,98,255,0.1); transform: translateY(-3px); }
+        .maid-card img { width: 100%; height: 160px; object-fit: cover; }
 
         .maid-card-no-img {
             width: 100%;
@@ -272,25 +245,23 @@
         }
 
         .maid-card-body { padding: 14px; }
+        .maid-card-body h4 { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+        .maid-card-body p { font-size: 12px; color: #888; margin-bottom: 2px; }
 
-        .maid-card-body h4 {
-            font-size: 15px;
+        /* NEW: Maid type badge in admin card */
+        .admin-type-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
             font-weight: 700;
-            color: var(--dark);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
-        .maid-card-body p {
-            font-size: 12px;
-            color: #888;
-            margin-bottom: 2px;
-        }
+        .admin-type-badge.full-time { background: #1a1a1a; color: #ffb400; }
+        .admin-type-badge.part-time { background: #e8f0ff; color: var(--primary); }
 
-        .maid-card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
+        .maid-card-actions { display: flex; gap: 8px; margin-top: 12px; }
 
         .edit-btn {
             flex: 1;
@@ -324,19 +295,9 @@
 
         .delete-btn:hover { background: #e74c3c; color: white; }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            padding: 22px;
-        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 22px; }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group.full { grid-column: 1 / -1; }
 
         .form-group label {
@@ -347,7 +308,8 @@
             letter-spacing: 0.5px;
         }
 
-        .form-group input {
+        .form-group input,
+        .form-group select {
             padding: 11px 14px;
             border: 1.5px solid #e0e7ff;
             border-radius: 10px;
@@ -359,7 +321,8 @@
             transition: 0.2s;
         }
 
-        .form-group input:focus {
+        .form-group input:focus,
+        .form-group select:focus {
             border-color: var(--primary);
             background: white;
             box-shadow: 0 0 0 3px rgba(0,98,255,0.08);
@@ -431,6 +394,21 @@
         .modal-body { padding: 22px; }
         .modal-body .form-group { margin-bottom: 14px; }
 
+        .modal-body .form-group input,
+        .modal-body .form-group select {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #e0e7ff;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            color: var(--dark);
+            background: #f8faff;
+            outline: none;
+            transition: 0.2s;
+            box-sizing: border-box;
+        }
+
         .modal-save-btn {
             width: 100%;
             padding: 12px;
@@ -454,12 +432,14 @@
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        .date-range { font-size: 12px; color: #555; line-height: 1.6; }
+        .date-range span { display: block; font-weight: 600; color: var(--primary); font-size: 11px; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <!-- FIXED: Maid blue, Easy gold -->
         <div class="sidebar-logo">
             <span class="maid-text">Maid</span><span class="easy-text">Easy</span>
         </div>
@@ -503,9 +483,7 @@
         </div>
 
         <div class="section active" id="section-bookings">
-            <div class="section-header">
-                <h2>Booking Management</h2>
-            </div>
+            <div class="section-header"><h2>Booking Management</h2></div>
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-calendar-alt"></i>
@@ -516,7 +494,7 @@
                         <tr>
                             <th>User Email</th>
                             <th>Maid Name</th>
-                            <th>Date</th>
+                            <th>Date Range</th>
                             <th>Time</th>
                             <th>Duration</th>
                             <th>Status</th>
@@ -529,9 +507,7 @@
         </div>
 
         <div class="section" id="section-maids">
-            <div class="section-header">
-                <h2>Manage Maids</h2>
-            </div>
+            <div class="section-header"><h2>Manage Maids</h2></div>
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-users"></i>
@@ -542,9 +518,7 @@
         </div>
 
         <div class="section" id="section-addmaid">
-            <div class="section-header">
-                <h2>Add New Maid</h2>
-            </div>
+            <div class="section-header"><h2>Add New Maid</h2></div>
             <div class="card">
                 <div class="card-header">
                     <i class="fas fa-user-plus"></i>
@@ -574,6 +548,14 @@
                     <div class="form-group">
                         <label>Image URL</label>
                         <input type="text" id="mImage" placeholder="Paste image URL">
+                    </div>
+                    <!-- NEW: Maid Type -->
+                    <div class="form-group">
+                        <label>Maid Type</label>
+                        <select id="mMaidType">
+                            <option value="part-time">⏰ Part Time</option>
+                            <option value="full-time">🏠 Full Time</option>
+                        </select>
                     </div>
                 </div>
                 <button class="add-maid-btn" onclick="addMaid()">
@@ -616,6 +598,14 @@
                     <label>Image URL</label>
                     <input type="text" id="editImage" placeholder="Image URL">
                 </div>
+                <!-- NEW: Maid Type in edit -->
+                <div class="form-group">
+                    <label>Maid Type</label>
+                    <select id="editMaidType">
+                        <option value="part-time">⏰ Part Time</option>
+                        <option value="full-time">🏠 Full Time</option>
+                    </select>
+                </div>
                 <button class="modal-save-btn" onclick="saveMaidEdit()">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
@@ -628,12 +618,8 @@
             window.location.href = 'login.html';
         }
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
-        }
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
 
-        // FIXED: pass btn reference directly
         function showSection(name, btn) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
@@ -653,27 +639,52 @@
                 document.getElementById('statPending').innerText = bookings.filter(b => b.status === 'Pending').length;
                 document.getElementById('statRejected').innerText = bookings.filter(b => b.status === 'Rejected').length;
 
-                tbody.innerHTML = bookings.map(b => `
-                    <tr>
-                        <td class="email-cell" title="${b.userEmail}">${b.userEmail}</td>
-                        <td>${b.maidName}</td>
-                        <td>${b.date}</td>
-                        <td>${b.time || 'N/A'}</td>
-                        <td>${b.duration || 'N/A'}</td>
-                        <td>
-                            <span class="status-badge ${(b.status||'').toLowerCase()}">
-                                ${b.status === 'Approved' ? '<i class="fas fa-check"></i>' : b.status === 'Rejected' ? '<i class="fas fa-times"></i>' : '<i class="fas fa-clock"></i>'}
-                                ${b.status}
-                            </span>
-                        </td>
-                        <td>
-                            ${b.status === 'Pending' ? `
-                                <button onclick="updateStatus('${b._id}', 'Approved')" class="approve-btn"><i class="fas fa-check"></i> Approve</button>
-                                <button onclick="updateStatus('${b._id}', 'Rejected')" class="reject-btn"><i class="fas fa-times"></i> Reject</button>
-                            ` : '—'}
-                        </td>
-                    </tr>
-                `).join('');
+                tbody.innerHTML = bookings.map(b => {
+                    const startD = b.startDate ? new Date(b.startDate).toLocaleDateString() : b.date;
+                    const endD   = b.endDate   ? new Date(b.endDate).toLocaleDateString()   : 'N/A';
+                    const statusClass = (b.status || '').toLowerCase();
+                    const statusIcon  = b.status === 'Approved' ? 'fa-check' : b.status === 'Rejected' ? 'fa-times' : b.status === 'Completed' ? 'fa-check-double' : 'fa-clock';
+
+                    let actionBtns = '';
+                    if (b.status === 'Pending') {
+                        actionBtns = `
+                            <button onclick="updateStatus('${b._id}', 'Approved')" class="approve-btn">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button onclick="updateStatus('${b._id}', 'Rejected')" class="reject-btn">
+                                <i class="fas fa-times"></i> Reject
+                            </button>`;
+                    } else if (b.status === 'Approved') {
+                        actionBtns = `
+                            <button onclick="cancelByAdmin('${b._id}')" class="cancel-btn">
+                                <i class="fas fa-ban"></i> Cancel (Maid Left)
+                            </button>`;
+                    } else {
+                        actionBtns = '—';
+                    }
+
+                    return `
+                        <tr>
+                            <td class="email-cell" title="${b.userEmail}">${b.userEmail}</td>
+                            <td>${b.maidName}</td>
+                            <td>
+                                <div class="date-range">
+                                    <span>From</span>${startD}
+                                    <span>To</span>${endD}
+                                </div>
+                            </td>
+                            <td>${b.time || 'N/A'}</td>
+                            <td>${b.duration || 'N/A'}</td>
+                            <td>
+                                <span class="status-badge ${statusClass}">
+                                    <i class="fas ${statusIcon}"></i>
+                                    ${b.status}
+                                </span>
+                            </td>
+                            <td>${actionBtns}</td>
+                        </tr>`;
+                }).join('');
+
             } catch (err) { console.error("Error:", err); }
         }
 
@@ -686,7 +697,21 @@
             fetchAllBookings();
         }
 
-        // FIXED: store maids in array, use index for edit/delete
+        async function cancelByAdmin(id) {
+            if (!confirm("Are you sure? This will cancel the booking on maid's behalf.")) return;
+            const res = await fetch('http://localhost:5000/admin/cancel-booking', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, reason: 'Maid left the job' })
+            });
+            if (res.ok) {
+                alert("Booking cancelled successfully!");
+                fetchAllBookings();
+            } else {
+                alert("Error cancelling booking.");
+            }
+        }
+
         let maidsData = [];
 
         async function fetchMaids() {
@@ -694,12 +719,17 @@
             maidsData = await res.json();
             const grid = document.getElementById('maidGrid');
 
-            grid.innerHTML = maidsData.map((m, index) => `
+            grid.innerHTML = maidsData.map((m, index) => {
+                const isFullTime = m.maidType === 'full-time';
+                return `
                 <div class="maid-card">
                     ${m.image
                         ? `<img src="${m.image}" alt="${m.name}" onerror="this.style.display='none'">`
                         : `<div class="maid-card-no-img"><i class="fas fa-user"></i></div>`}
                     <div class="maid-card-body">
+                        <span class="admin-type-badge ${isFullTime ? 'full-time' : 'part-time'}">
+                            ${isFullTime ? '🏠 Full Time' : '⏰ Part Time'}
+                        </span>
                         <h4>${m.name}</h4>
                         <p><i class="fas fa-broom"></i> ${m.service || 'N/A'}</p>
                         <p><i class="fas fa-map-marker-alt"></i> ${m.location || 'N/A'}</p>
@@ -713,10 +743,11 @@
                             </button>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
+        // UPDATED: maidType add kiya
         async function addMaid() {
             const maidData = {
                 name: document.getElementById('mName').value,
@@ -724,7 +755,8 @@
                 price: document.getElementById('mPrice').value,
                 location: document.getElementById('mLocation').value,
                 serviceCategory: document.getElementById('mCategory').value,
-                image: document.getElementById('mImage').value
+                image: document.getElementById('mImage').value,
+                maidType: document.getElementById('mMaidType').value
             };
 
             const res = await fetch('http://localhost:5000/admin/add-maid', {
@@ -741,12 +773,13 @@
                 document.getElementById('mLocation').value = '';
                 document.getElementById('mCategory').value = '';
                 document.getElementById('mImage').value = '';
+                document.getElementById('mMaidType').value = 'part-time';
             } else {
                 alert("Error adding maid");
             }
         }
 
-        // FIXED: use index to get maid from maidsData array
+        // UPDATED: maidType fill karo
         function openEditModal(index) {
             const m = maidsData[index];
             document.getElementById('editMaidId').value = m._id;
@@ -756,13 +789,13 @@
             document.getElementById('editLocation').value = m.location || '';
             document.getElementById('editCategory').value = m.serviceCategory || '';
             document.getElementById('editImage').value = m.image || '';
+            document.getElementById('editMaidType').value = m.maidType || 'part-time';
             document.getElementById('editModal').classList.add('active');
         }
 
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('active');
-        }
+        function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
+        // UPDATED: maidType send karo
         async function saveMaidEdit() {
             const id = document.getElementById('editMaidId').value;
             const updatedData = {
@@ -772,7 +805,8 @@
                 price: document.getElementById('editPrice').value,
                 location: document.getElementById('editLocation').value,
                 serviceCategory: document.getElementById('editCategory').value,
-                image: document.getElementById('editImage').value
+                image: document.getElementById('editImage').value,
+                maidType: document.getElementById('editMaidType').value
             };
 
             const res = await fetch('http://localhost:5000/admin/update-maid', {
@@ -790,7 +824,6 @@
             }
         }
 
-        // FIXED: use index to get maid ID from maidsData array
         async function deleteMaid(index) {
             const m = maidsData[index];
             if (!confirm(`Are you sure you want to delete ${m.name}?`)) return;

@@ -220,7 +220,6 @@
                     localStorage.setItem('isLoggedIn', 'true');
                     localStorage.setItem('userEmail', email); 
                     
-                    // Yahan role set karna zaroori hai taake admin.html ise read kar sake
                     if (data.role && data.role.toLowerCase() === 'admin') {
                         localStorage.setItem('userRole', 'admin');
                         window.location.href = "admin.html";

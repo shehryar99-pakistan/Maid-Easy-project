@@ -18,7 +18,6 @@
             padding: 30px 20px;
         }
 
-        /* ── NAV ── */
         nav {
             display: flex;
             justify-content: space-between;
@@ -50,7 +49,6 @@
 
         .back-btn:hover { background: #004dc7; transform: translateY(-1px); }
 
-        /* ── PAGE HEADER ── */
         .page-header {
             max-width: 1000px;
             margin: 0 auto 25px auto;
@@ -59,12 +57,7 @@
             justify-content: space-between;
         }
 
-        .page-header h1 {
-            font-size: 26px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
+        .page-header h1 { font-size: 26px; font-weight: 700; color: var(--dark); }
         .page-header h1 span { color: var(--primary); }
 
         .booking-count {
@@ -76,7 +69,6 @@
             border-radius: 20px;
         }
 
-        /* ── STATS ROW ── */
         .stats-row {
             max-width: 1000px;
             margin: 0 auto 25px auto;
@@ -107,22 +99,12 @@
         }
 
         .stat-icon.approved { background: #e6f9f0; color: #27ae60; }
-        .stat-icon.pending { background: #fff8e6; color: #f39c12; }
+        .stat-icon.pending  { background: #fff8e6; color: #f39c12; }
         .stat-icon.rejected { background: #ffe8e8; color: #e74c3c; }
 
-        .stat-info p {
-            font-size: 12px;
-            color: #888;
-            font-weight: 500;
-        }
+        .stat-info p  { font-size: 12px; color: #888; font-weight: 500; }
+        .stat-info h3 { font-size: 22px; font-weight: 700; color: var(--dark); }
 
-        .stat-info h3 {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--dark);
-        }
-
-        /* ── MAIN CONTAINER ── */
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -140,18 +122,11 @@
             gap: 10px;
         }
 
-        .container-header i { color: var(--primary); font-size: 18px; }
+        .container-header i  { color: var(--primary); font-size: 18px; }
         .container-header h2 { font-size: 16px; font-weight: 700; color: var(--dark); }
 
-        /* ── TABLE ── */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: #f8faff;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8faff; }
 
         th {
             padding: 14px 20px;
@@ -171,19 +146,11 @@
             border-bottom: 1px solid #f5f7ff;
         }
 
-        tbody tr {
-            transition: background 0.2s;
-        }
-
+        tbody tr { transition: background 0.2s; }
         tbody tr:hover { background: #f8faff; }
         tbody tr:last-child td { border-bottom: none; }
 
-        /* Maid name with icon */
-        .maid-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .maid-cell { display: flex; align-items: center; gap: 10px; }
 
         .maid-avatar {
             width: 36px;
@@ -201,7 +168,6 @@
 
         .maid-name { font-weight: 600; }
 
-        /* Date cell */
         .date-cell {
             display: flex;
             align-items: center;
@@ -211,7 +177,21 @@
 
         .date-cell i { color: var(--primary); font-size: 13px; }
 
-        /* Duration badge */
+        .date-range {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .date-range span {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
         .duration-badge {
             background: #f0f5ff;
             color: var(--primary);
@@ -222,7 +202,36 @@
             display: inline-block;
         }
 
-        /* Status badges */
+        /* Full time duration badge */
+        .duration-badge.fulltime {
+            background: #1a1a1a;
+            color: #ffb400;
+        }
+
+        .type-badge {
+            background: #fff8e6;
+            color: #f39c12;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        /* NEW: Maid type badge in table */
+        .maid-type-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        .maid-type-tag.full-time { background: #1a1a1a; color: #ffb400; }
+        .maid-type-tag.part-time { background: #e8f0ff; color: var(--primary); }
+
         .status-badge {
             padding: 5px 14px;
             border-radius: 20px;
@@ -233,42 +242,15 @@
             gap: 5px;
         }
 
-        .status-badge.approved {
-            background: #e6f9f0;
-            color: #27ae60;
-        }
+        .status-badge.approved  { background: #e6f9f0; color: #27ae60; }
+        .status-badge.pending   { background: #fff8e6; color: #f39c12; }
+        .status-badge.rejected  { background: #ffe8e8; color: #e74c3c; }
+        .status-badge.completed { background: #e8f0ff; color: var(--primary); }
 
-        .status-badge.pending {
-            background: #fff8e6;
-            color: #f39c12;
-        }
-
-        .status-badge.rejected {
-            background: #ffe8e8;
-            color: #e74c3c;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .empty-state i {
-            font-size: 50px;
-            color: #c0d0ff;
-            margin-bottom: 15px;
-            display: block;
-        }
-
-        .empty-state h3 {
-            font-size: 18px;
-            color: #aaa;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .empty-state p { font-size: 14px; color: #bbb; }
+        .empty-state { text-align: center; padding: 60px 20px; }
+        .empty-state i { font-size: 50px; color: #c0d0ff; margin-bottom: 15px; display: block; }
+        .empty-state h3 { font-size: 18px; color: #aaa; font-weight: 600; margin-bottom: 8px; }
+        .empty-state p  { font-size: 14px; color: #bbb; }
 
         @media (max-width: 700px) {
             .stats-row { grid-template-columns: 1fr; }
@@ -279,7 +261,6 @@
 </head>
 <body>
 
-    <!-- NAV -->
     <nav>
         <div class="logo-text">Maid<span>Easy</span></div>
         <a href="dashboard.html" class="back-btn">
@@ -287,38 +268,26 @@
         </a>
     </nav>
 
-    <!-- PAGE HEADER -->
     <div class="page-header">
         <h1>My <span>Bookings</span></h1>
         <div class="booking-count" id="totalCount">0 Bookings</div>
     </div>
 
-    <!-- STATS ROW -->
     <div class="stats-row">
         <div class="stat-card">
             <div class="stat-icon approved"><i class="fas fa-check-circle"></i></div>
-            <div class="stat-info">
-                <p>Approved</p>
-                <h3 id="approvedCount">0</h3>
-            </div>
+            <div class="stat-info"><p>Approved</p><h3 id="approvedCount">0</h3></div>
         </div>
         <div class="stat-card">
             <div class="stat-icon pending"><i class="fas fa-clock"></i></div>
-            <div class="stat-info">
-                <p>Pending</p>
-                <h3 id="pendingCount">0</h3>
-            </div>
+            <div class="stat-info"><p>Pending</p><h3 id="pendingCount">0</h3></div>
         </div>
         <div class="stat-card">
             <div class="stat-icon rejected"><i class="fas fa-times-circle"></i></div>
-            <div class="stat-info">
-                <p>Rejected</p>
-                <h3 id="rejectedCount">0</h3>
-            </div>
+            <div class="stat-info"><p>Rejected</p><h3 id="rejectedCount">0</h3></div>
         </div>
     </div>
 
-    <!-- BOOKINGS TABLE -->
     <div class="container">
         <div class="container-header">
             <i class="fas fa-calendar-alt"></i>
@@ -330,9 +299,9 @@
                 <tr>
                     <th>#</th>
                     <th>Maid Name</th>
-                    <th>Date</th>
+                    <th>Date Range</th>
                     <th>Time</th>
-                    <th>Duration</th>
+                    <th>Daily Hours</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -341,7 +310,6 @@
     </div>
 
     <script>
-        // Agar user login nahi hai toh login page par redirect karo
         if (localStorage.getItem('isLoggedIn') !== 'true') {
             window.location.href = "login.html";
         }
@@ -354,13 +322,11 @@
                 const bookings = await response.json();
                 const tbody = document.getElementById('bookingBody');
 
-                // Update stats
                 document.getElementById('totalCount').innerText = bookings.length + ' Bookings';
                 document.getElementById('approvedCount').innerText = bookings.filter(b => b.status === 'Approved').length;
-                document.getElementById('pendingCount').innerText = bookings.filter(b => b.status === 'Pending').length;
+                document.getElementById('pendingCount').innerText  = bookings.filter(b => b.status === 'Pending').length;
                 document.getElementById('rejectedCount').innerText = bookings.filter(b => b.status === 'Rejected').length;
 
-                // Agar bookings nahi milin
                 if (bookings.length === 0) {
                     tbody.innerHTML = `
                         <tr>
@@ -375,49 +341,81 @@
                     return;
                 }
 
-                // FIX: duration word fix — "1 hour" not "1 hour hours"
-                function formatDuration(duration) {
+                // Duration format — singular/plural + full-time handle
+                function formatDuration(duration, maidType) {
                     if (!duration) return 'N/A';
-                    // Remove any existing "hours" or "hour" from stored value
+                    if (maidType === 'full-time' || duration === 'Full Time') {
+                        return `<span class="duration-badge fulltime">🏠 Full Time</span>`;
+                    }
                     const num = parseInt(duration);
-                    if (isNaN(num)) return duration;
-                    return num === 1 ? '1 Hour' : `${num} Hours`;
+                    if (isNaN(num)) return `<span class="duration-badge">${duration}</span>`;
+                    const label = num === 1 ? '1 Hour' : `${num} Hours`;
+                    return `<span class="duration-badge">${label}</span>`;
                 }
 
-                // Status badge helper
+                // Time format — full-time handle
+                function formatTime(time, maidType) {
+                    if (maidType === 'full-time' || time === 'Full Time') {
+                        return `<span style="color:#f39c12; font-weight:600;">🏠 Full Time</span>`;
+                    }
+                    return `<div class="date-cell"><i class="fas fa-clock"></i> ${time || 'N/A'}</div>`;
+                }
+
+                function formatDurationType(type) {
+                    if (!type) return '';
+                    const map = {
+                        '15days'  : '15 Days',
+                        '1month'  : '1 Month',
+                        '2months' : '2 Months',
+                        'custom'  : 'Custom'
+                    };
+                    return map[type] || type;
+                }
+
                 function statusBadge(status) {
                     const s = (status || 'Pending').toLowerCase();
-                    const icons = { approved: 'fa-check-circle', pending: 'fa-clock', rejected: 'fa-times-circle' };
+                    const icons = {
+                        approved  : 'fa-check-circle',
+                        pending   : 'fa-clock',
+                        rejected  : 'fa-times-circle',
+                        completed : 'fa-check-double'
+                    };
                     const icon = icons[s] || 'fa-clock';
                     return `<span class="status-badge ${s}"><i class="fas ${icon}"></i> ${status}</span>`;
                 }
 
-                // Data table me show karna
-                tbody.innerHTML = bookings.map((b, index) => `
-                    <tr>
-                        <td style="color:#aaa; font-size:13px;">${index + 1}</td>
-                        <td>
-                            <div class="maid-cell">
-                                <div class="maid-avatar">${b.maidName ? b.maidName.charAt(0).toUpperCase() : 'M'}</div>
-                                <span class="maid-name">${b.maidName || 'N/A'}</span>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="fas fa-calendar"></i>
-                                ${b.date || 'N/A'}
-                            </div>
-                        </td>
-                        <td>
-                            <div class="date-cell">
-                                <i class="fas fa-clock"></i>
-                                ${b.time || 'N/A'}
-                            </div>
-                        </td>
-                        <td><span class="duration-badge">${formatDuration(b.duration)}</span></td>
-                        <td>${statusBadge(b.status)}</td>
-                    </tr>
-                `).join('');
+                tbody.innerHTML = bookings.map((b, index) => {
+
+                    const startD     = b.startDate ? new Date(b.startDate).toLocaleDateString() : b.date;
+                    const endD       = b.endDate   ? new Date(b.endDate).toLocaleDateString()   : 'N/A';
+                    const isFullTime = b.maidType  === 'full-time';
+
+                    return `
+                        <tr>
+                            <td style="color:#aaa; font-size:13px;">${index + 1}</td>
+                            <td>
+                                <div class="maid-cell">
+                                    <div class="maid-avatar">${b.maidName ? b.maidName.charAt(0).toUpperCase() : 'M'}</div>
+                                    <div>
+                                        <span class="maid-name">${b.maidName || 'N/A'}</span><br>
+                                        <span class="maid-type-tag ${isFullTime ? 'full-time' : 'part-time'}">
+                                            ${isFullTime ? '🏠 Full Time' : '⏰ Part Time'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="date-range">
+                                    <span>From</span>${startD}<br>
+                                    <span>To</span>${endD}
+                                </div>
+                                ${b.durationType ? `<div class="type-badge">${formatDurationType(b.durationType)}</div>` : ''}
+                            </td>
+                            <td>${formatTime(b.time, b.maidType)}</td>
+                            <td>${formatDuration(b.duration, b.maidType)}</td>
+                            <td>${statusBadge(b.status)}</td>
+                        </tr>`;
+                }).join('');
 
             } catch (err) {
                 console.error("Error fetching bookings:", err);

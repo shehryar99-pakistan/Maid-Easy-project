@@ -7,9 +7,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #0062ff; --gold: #ffb400; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f8ff; }
-        .signup-card { background: rgba(255, 255, 255, 0.98); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; border: 1px solid #eee; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f8ff;
+        }
+
+        .left-panel {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .left-panel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: top;
+            display: block;
+        }
+
+        .right-panel {
+            width: 400px;
+            min-width: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .signup-card { background: rgba(255, 255, 255, 0.98); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 100%; text-align: center; border: 1px solid #eee; }
         .logo-section { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 15px; }
         .logo-icon { width: 35px; height: 35px; background: var(--primary); border-radius: 8px; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; }
         .logo-text { font-size: 22px; font-weight: 700; color: var(--primary); }
@@ -21,41 +51,59 @@
     </style>
 </head>
 <body>
-    <div class="signup-card">
-        <div class="logo-section">
-            <div class="logo-icon">M</div>
-            <div class="logo-text">Maid<span>Easy</span></div>
+
+    <div class="left-panel">
+        <img src="frontend/maid-signup.png" alt="MaidEasy">
+    </div>
+
+    <div class="right-panel">
+        <div class="signup-card">
+            <div class="logo-section">
+                <div class="logo-icon">M</div>
+                <div class="logo-text">Maid<span>Easy</span></div>
+            </div>
+            <h2 style="margin:0 0 10px 0; font-size: 18px; color: #333;">Create Account</h2>
+            <form id="registerForm">
+                <div class="input-group"> <label>First Name</label> <input type="text" name="firstName" required> </div>
+                <div class="input-group"> <label>Last Name</label> <input type="text" name="lastName" required> </div>
+                <div class="input-group"> <label>Mobile Number</label> <input type="text" name="mobile" required> </div>
+                <div class="input-group"> <label>Email Address</label> <input type="email" name="email" required> </div>
+                <div class="input-group"> <label>Password</label> <input type="password" name="password" id="password" required> </div>
+                <div class="input-group"> <label>Confirm Password</label> <input type="password" name="confirmPassword" id="confirmPassword" required> </div>
+                <button type="submit" class="signup-btn">Sign Up</button>
+            </form>
+
+            <p style="margin-top: 15px; font-size: 13px; color: #666;">
+                Already have an account?
+                <a href="login.html" style="color: #0062ff; font-weight: 600; text-decoration: none;">Login here</a>
+            </p>
+
+            <p style="margin-top: 8px; font-size: 13px;">
+                <a href="index.html" style="color: #999; text-decoration: none;">← Back to Home</a>
+            </p>
         </div>
-        <h2 style="margin:0 0 10px 0; font-size: 18px; color: #333;">Create Account</h2>
-        <form id="registerForm">
-            <div class="input-group"> <label>First Name</label> <input type="text" name="firstName" required> </div>
-            <div class="input-group"> <label>Last Name</label> <input type="text" name="lastName" required> </div>
-            <div class="input-group"> <label>Mobile Number</label> <input type="text" name="mobile" required> </div>
-            <div class="input-group"> <label>Email Address</label> <input type="email" name="email" required> </div>
-            <div class="input-group"> <label>Password</label> <input type="password" name="password" id="password" required> </div>
-            <div class="input-group"> <label>Confirm Password</label> <input type="password" name="confirmPassword" id="confirmPassword" required> </div>
-            <button type="submit" class="signup-btn">Sign Up</button>
-        </form>
-
-        <!-- ADDED: Login link -->
-        <p style="margin-top: 15px; font-size: 13px; color: #666;">
-            Already have an account?
-            <a href="login.html" style="color: #0062ff; font-weight: 600; text-decoration: none;">Login here</a>
-        </p>
-
-        <!-- ADDED: Back to Home link -->
-        <p style="margin-top: 8px; font-size: 13px;">
-            <a href="index.html" style="color: #999; text-decoration: none;">← Back to Home</a>
-        </p>
-
     </div>
 
     <script>
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            const email = e.target.email.value;
+            const mobile = e.target.mobile.value;
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (!email.includes('@')) {
+                return alert("⚠️ Please enter a valid email address (must include @).");
+            }
+
+            if (mobile.length > 11) {
+                return alert("⚠️ Mobile number must not exceed 11 digits.");
+            }
+
+            if (password.length < 8) {
+                return alert("⚠️ Password must be at least 8 characters long.");
+            }
 
             if (password !== confirmPassword) {
                 return alert("Passwords do not match!");
@@ -64,8 +112,8 @@
             const formData = {
                 firstName: e.target.firstName.value,
                 lastName: e.target.lastName.value,
-                mobile: e.target.mobile.value,
-                email: e.target.email.value,
+                mobile: mobile,
+                email: email,
                 password: password
             };
 
@@ -77,7 +125,6 @@
 
             const result = await response.json();
 
-            // UPDATED: show proper message and redirect on success
             if (response.ok) {
                 alert("✅ Account created successfully! Please login.");
                 window.location.href = "login.html";

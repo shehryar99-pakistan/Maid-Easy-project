@@ -154,7 +154,6 @@
         .card-header i { color: var(--primary); font-size: 20px; }
         .card-header h2 { font-size: 18px; font-weight: 700; color: var(--dark); }
 
-        /* Edit / Cancel button */
         .edit-toggle-btn {
             background: #f0f5ff;
             color: var(--primary);
@@ -209,7 +208,6 @@
             width: 100%;
         }
 
-        /* Disabled/readonly state */
         .input-group input:disabled {
             background: #f4f8ff;
             color: #888;
@@ -248,7 +246,6 @@
             box-shadow: 0 6px 20px rgba(0,98,255,0.3);
         }
 
-        /* Hidden by default — shown when editing */
         #saveSection { display: none; }
 
         #imgModal {
@@ -296,7 +293,6 @@
 
     <div class="profile-wrapper">
 
-        <!-- LEFT: Avatar Card -->
         <div class="left-card">
             <div class="avatar-wrapper" onclick="document.getElementById('picUpload').click()">
                 <div class="avatar" id="avatarPreview">
@@ -319,14 +315,12 @@
             </p>
         </div>
 
-        <!-- RIGHT: Edit Form -->
         <div class="right-card">
             <div class="card-header">
                 <div class="card-header-left">
                     <i class="fas fa-user-edit"></i>
                     <h2>Profile Information</h2>
                 </div>
-                <!-- Edit Toggle Button -->
                 <button class="edit-toggle-btn" id="editToggleBtn" onclick="toggleEdit()">
                     <i class="fas fa-pen"></i> Edit
                 </button>
@@ -351,7 +345,6 @@
                 </div>
             </div>
 
-            <!-- Save button — only shows when editing -->
             <div id="saveSection">
                 <button class="save-btn" onclick="updateProfile()">
                     <i class="fas fa-save"></i> Save Changes
@@ -361,7 +354,6 @@
 
     </div>
 
-    <!-- Image View Modal -->
     <div id="imgModal">
         <span class="close-modal" onclick="closeModal()">&times;</span>
         <img id="modalImg" src="" alt="Profile Large">
@@ -372,8 +364,8 @@
         document.getElementById('displayEmail').innerText = email || '';
 
         let isEditing = false;
+        let originalPhone = ''; // NEW: purana phone store karo
 
-        // Toggle edit mode
         function toggleEdit() {
             isEditing = !isEditing;
             const fields = ['firstName', 'lastName', 'phone', 'emailField'];
@@ -381,6 +373,9 @@
             const saveSection = document.getElementById('saveSection');
 
             if (isEditing) {
+                // Phone ka purana value store karo comparison ke liye
+                originalPhone = document.getElementById('phone').value;
+
                 fields.forEach(id => document.getElementById(id).disabled = false);
                 btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
                 btn.style.background = '#fff0f0';
@@ -394,11 +389,10 @@
                 btn.style.color = 'var(--primary)';
                 btn.style.borderColor = 'var(--primary)';
                 saveSection.style.display = 'none';
-                fetchProfile(); // reset changes if cancelled
+                fetchProfile();
             }
         }
 
-        // Preview image before upload
         function previewImage(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -413,7 +407,6 @@
             reader.readAsDataURL(file);
         }
 
-        // Double click avatar to view large
         document.getElementById('avatarPreview').addEventListener('dblclick', () => {
             const src = document.getElementById('avatarImg').src;
             if (!src || src === window.location.href) return;
@@ -425,7 +418,6 @@
             document.getElementById('imgModal').classList.remove('active');
         }
 
-        // Original fetchProfile logic preserved
         async function fetchProfile() {
             if (!email) return;
             const res = await fetch(`http://localhost:5000/get-profile?email=${email}`);
@@ -433,15 +425,17 @@
             const user = await res.json();
 
             document.getElementById('firstName').value = user.firstName || '';
-            document.getElementById('lastName').value = user.lastName || '';
-            document.getElementById('phone').value = user.phone || '';
-            document.getElementById('emailField').value = user.email || email;
+            document.getElementById('lastName').value  = user.lastName  || '';
+            document.getElementById('phone').value     = user.phone     || '';
+            document.getElementById('emailField').value = user.email    || email;
+
+            originalPhone = user.phone || ''; // Store original phone
 
             const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
             document.getElementById('displayName').innerText = fullName || 'Your Name';
 
             if (user.profilePic) {
-                const img = document.getElementById('avatarImg');
+                const img  = document.getElementById('avatarImg');
                 const icon = document.getElementById('avatarIcon');
                 img.src = user.profilePic;
                 img.style.display = 'block';
@@ -449,13 +443,15 @@
             }
         }
 
-        // Original updateProfile logic preserved exactly
+        // UPDATED: updateProfile with notifications
         async function updateProfile() {
-            const fileInput = document.getElementById('picUpload');
-            const file = fileInput.files[0];
+            const fileInput  = document.getElementById('picUpload');
+            const file       = fileInput.files[0];
+            const newPhone   = document.getElementById('phone').value;
+            const newFirst   = document.getElementById('firstName').value;
+            const newLast    = document.getElementById('lastName').value;
 
             let base64Image = null;
-
             if (file) {
                 base64Image = await new Promise((resolve) => {
                     const reader = new FileReader();
@@ -465,16 +461,15 @@
             }
 
             const data = {
-                email: email,
-                firstName: document.getElementById('firstName').value,
-                lastName: document.getElementById('lastName').value,
-                phone: document.getElementById('phone').value,
-                address: document.getElementById('emailField').value
+                email:      email,
+                firstName:  newFirst,
+                lastName:   newLast,
+                phone:      newPhone,
+                address:    document.getElementById('emailField').value,
+                // NEW: notification triggers
+                oldPhone:   originalPhone,
+                profilePic: base64Image || undefined
             };
-
-            if (base64Image) {
-                data.profilePic = base64Image;
-            }
 
             try {
                 const res = await fetch('http://localhost:5000/update-profile', {
@@ -483,7 +478,7 @@
                     body: JSON.stringify(data)
                 });
 
-                if(res.ok) {
+                if (res.ok) {
                     alert("Profile Updated Successfully!");
                     isEditing = false;
                     toggleEdit();
