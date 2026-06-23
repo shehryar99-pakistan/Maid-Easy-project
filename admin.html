@@ -176,6 +176,18 @@
         .status-badge.rejected { background: #ffe8e8; color: #e74c3c; }
         .status-badge.completed { background: #e8f0ff; color: var(--primary); }
 
+        .payment-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .payment-badge.paid   { background: #e6f9f0; color: #27ae60; }
+        .payment-badge.unpaid { background: #fff8e6; color: #f39c12; }
+
         .approve-btn {
             background: #27ae60;
             color: white;
@@ -248,7 +260,6 @@
         .maid-card-body h4 { font-size: 15px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
         .maid-card-body p { font-size: 12px; color: #888; margin-bottom: 2px; }
 
-        /* NEW: Maid type badge in admin card */
         .admin-type-badge {
             display: inline-block;
             padding: 3px 10px;
@@ -361,6 +372,17 @@
 
         #editModal.active { display: flex; }
 
+        #rejectModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        #rejectModal.active { display: flex; }
+
         .modal-box {
             background: white;
             border-radius: 20px;
@@ -395,7 +417,8 @@
         .modal-body .form-group { margin-bottom: 14px; }
 
         .modal-body .form-group input,
-        .modal-body .form-group select {
+        .modal-body .form-group select,
+        .modal-body .form-group textarea {
             width: 100%;
             padding: 11px 14px;
             border: 1.5px solid #e0e7ff;
@@ -408,6 +431,8 @@
             transition: 0.2s;
             box-sizing: border-box;
         }
+
+        .modal-body .form-group textarea { resize: vertical; min-height: 80px; }
 
         .modal-save-btn {
             width: 100%;
@@ -426,6 +451,22 @@
 
         .modal-save-btn:hover { background: #004dc7; }
 
+        .modal-reject-btn {
+            width: 100%;
+            padding: 12px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: 0.3s;
+            margin-top: 6px;
+        }
+        .modal-reject-btn:hover { background: #c0392b; }
+
         .email-cell {
             max-width: 180px;
             overflow: hidden;
@@ -435,6 +476,10 @@
 
         .date-range { font-size: 12px; color: #555; line-height: 1.6; }
         .date-range span { display: block; font-weight: 600; color: var(--primary); font-size: 11px; }
+
+        .empty-pending { text-align: center; padding: 40px 20px; color: #bbb; }
+        .empty-pending i { font-size: 40px; color: #d0d8ff; display: block; margin-bottom: 12px; }
+        .empty-pending p { font-size: 14px; }
     </style>
 </head>
 <body>
@@ -454,6 +499,10 @@
             </button>
             <button class="menu-item" onclick="showSection('addmaid', this)">
                 <i class="fas fa-user-plus"></i> Add Maid
+            </button>
+            <button class="menu-item" onclick="showSection('pending', this)">
+                <i class="fas fa-user-clock"></i> Agent Submissions
+                <span id="pendingBadge" style="background:#e74c3c;color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-left:auto;display:none;">0</span>
             </button>
             <button class="menu-item logout-item" onclick="logout()">
                 <i class="fas fa-sign-out-alt"></i> Logout
@@ -498,6 +547,7 @@
                             <th>Time</th>
                             <th>Duration</th>
                             <th>Status</th>
+                            <th>Payment</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -549,7 +599,6 @@
                         <label>Image URL</label>
                         <input type="text" id="mImage" placeholder="Paste image URL">
                     </div>
-                    <!-- NEW: Maid Type -->
                     <div class="form-group">
                         <label>Maid Type</label>
                         <select id="mMaidType">
@@ -561,6 +610,30 @@
                 <button class="add-maid-btn" onclick="addMaid()">
                     <i class="fas fa-plus"></i> Add Maid
                 </button>
+            </div>
+        </div>
+
+        <div class="section" id="section-pending">
+            <div class="section-header"><h2>Agent Submissions</h2></div>
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-user-clock"></i>
+                    <h3>Pending Maid Verifications</h3>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Maid Name</th>
+                            <th>Submitted By</th>
+                            <th>Location</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Submitted At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingMaidBody"></tbody>
+                </table>
             </div>
         </div>
 
@@ -598,7 +671,6 @@
                     <label>Image URL</label>
                     <input type="text" id="editImage" placeholder="Image URL">
                 </div>
-                <!-- NEW: Maid Type in edit -->
                 <div class="form-group">
                     <label>Maid Type</label>
                     <select id="editMaidType">
@@ -608,6 +680,26 @@
                 </div>
                 <button class="modal-save-btn" onclick="saveMaidEdit()">
                     <i class="fas fa-save"></i> Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="rejectModal">
+        <div class="modal-box" style="width:400px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-times-circle"></i> Reject Maid Submission</h3>
+                <button class="modal-close" onclick="closeRejectModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="rejectMaidId">
+                <p style="font-size:13px;color:#555;margin-bottom:14px;">Please provide a reason for rejecting this maid submission. The agent will be notified.</p>
+                <div class="form-group">
+                    <label>Rejection Reason</label>
+                    <textarea id="rejectReason" placeholder="e.g. Incomplete documents, Failed background check..."></textarea>
+                </div>
+                <button class="modal-reject-btn" onclick="confirmReject()">
+                    <i class="fas fa-times"></i> Confirm Rejection
                 </button>
             </div>
         </div>
@@ -626,6 +718,7 @@
             document.getElementById('section-' + name).classList.add('active');
             if (btn) btn.classList.add('active');
             if (name === 'maids') fetchMaids();
+            if (name === 'pending') fetchPendingMaids();
         }
 
         async function fetchAllBookings() {
@@ -634,14 +727,14 @@
                 const bookings = await response.json();
                 const tbody = document.getElementById('adminBookingBody');
 
-                document.getElementById('statTotal').innerText = bookings.length;
+                document.getElementById('statTotal').innerText    = bookings.length;
                 document.getElementById('statApproved').innerText = bookings.filter(b => b.status === 'Approved').length;
-                document.getElementById('statPending').innerText = bookings.filter(b => b.status === 'Pending').length;
+                document.getElementById('statPending').innerText  = bookings.filter(b => b.status === 'Pending').length;
                 document.getElementById('statRejected').innerText = bookings.filter(b => b.status === 'Rejected').length;
 
                 tbody.innerHTML = bookings.map(b => {
-                    const startD = b.startDate ? new Date(b.startDate).toLocaleDateString() : b.date;
-                    const endD   = b.endDate   ? new Date(b.endDate).toLocaleDateString()   : 'N/A';
+                    const startD      = b.startDate ? new Date(b.startDate).toLocaleDateString() : b.date;
+                    const endD        = b.endDate   ? new Date(b.endDate).toLocaleDateString()   : 'N/A';
                     const statusClass = (b.status || '').toLowerCase();
                     const statusIcon  = b.status === 'Approved' ? 'fa-check' : b.status === 'Rejected' ? 'fa-times' : b.status === 'Completed' ? 'fa-check-double' : 'fa-clock';
 
@@ -663,6 +756,16 @@
                         actionBtns = '—';
                     }
 
+                    let paymentCell = '';
+                    if (b.paymentStatus === 'Paid') {
+                        paymentCell = `<span class="payment-badge paid"><i class="fas fa-check-circle"></i> Paid</span>`;
+                        if (b.transactionId) {
+                            paymentCell += `<br><small style="color:#aaa;font-size:10px;">${b.transactionId}</small>`;
+                        }
+                    } else {
+                        paymentCell = `<span class="payment-badge unpaid"><i class="fas fa-clock"></i> Unpaid</span>`;
+                    }
+
                     return `
                         <tr>
                             <td class="email-cell" title="${b.userEmail}">${b.userEmail}</td>
@@ -681,6 +784,7 @@
                                     ${b.status}
                                 </span>
                             </td>
+                            <td>${paymentCell}</td>
                             <td>${actionBtns}</td>
                         </tr>`;
                 }).join('');
@@ -747,7 +851,6 @@
             }).join('');
         }
 
-        // UPDATED: maidType add kiya
         async function addMaid() {
             const maidData = {
                 name: document.getElementById('mName').value,
@@ -767,35 +870,33 @@
 
             if (res.ok) {
                 alert("Maid added successfully!");
-                document.getElementById('mName').value = '';
-                document.getElementById('mService').value = '';
-                document.getElementById('mPrice').value = '';
+                document.getElementById('mName').value     = '';
+                document.getElementById('mService').value  = '';
+                document.getElementById('mPrice').value    = '';
                 document.getElementById('mLocation').value = '';
                 document.getElementById('mCategory').value = '';
-                document.getElementById('mImage').value = '';
+                document.getElementById('mImage').value    = '';
                 document.getElementById('mMaidType').value = 'part-time';
             } else {
                 alert("Error adding maid");
             }
         }
 
-        // UPDATED: maidType fill karo
         function openEditModal(index) {
             const m = maidsData[index];
-            document.getElementById('editMaidId').value = m._id;
-            document.getElementById('editName').value = m.name || '';
-            document.getElementById('editService').value = m.service || '';
-            document.getElementById('editPrice').value = m.price || '';
+            document.getElementById('editMaidId').value   = m._id;
+            document.getElementById('editName').value     = m.name || '';
+            document.getElementById('editService').value  = m.service || '';
+            document.getElementById('editPrice').value    = m.price || '';
             document.getElementById('editLocation').value = m.location || '';
             document.getElementById('editCategory').value = m.serviceCategory || '';
-            document.getElementById('editImage').value = m.image || '';
+            document.getElementById('editImage').value    = m.image || '';
             document.getElementById('editMaidType').value = m.maidType || 'part-time';
             document.getElementById('editModal').classList.add('active');
         }
 
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
-        // UPDATED: maidType send karo
         async function saveMaidEdit() {
             const id = document.getElementById('editMaidId').value;
             const updatedData = {
@@ -842,7 +943,106 @@
             }
         }
 
+        async function fetchPendingMaids() {
+            try {
+                const res = await fetch('http://localhost:5000/admin/pending-maids');
+                const maids = await res.json();
+                const tbody = document.getElementById('pendingMaidBody');
+
+                const badge = document.getElementById('pendingBadge');
+                if (maids.length > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = maids.length;
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                if (maids.length === 0) {
+                    tbody.innerHTML = `
+                        <tr><td colspan="7">
+                            <div class="empty-pending">
+                                <i class="fas fa-check-circle"></i>
+                                <p>No pending submissions from agents.</p>
+                            </div>
+                        </td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = maids.map(m => {
+                    const isFullTime  = m.maidType === 'full-time';
+                    const submittedAt = m.submittedAt ? new Date(m.submittedAt).toLocaleDateString() : 'N/A';
+                    return `
+                        <tr>
+                            <td><strong>${m.name}</strong></td>
+                            <td style="font-size:12px;color:var(--primary);font-weight:600;">${m.submittedBy || 'N/A'}</td>
+                            <td>${m.location || 'N/A'}</td>
+                            <td>${m.serviceCategory || 'N/A'}</td>
+                            <td>
+                                <span class="admin-type-badge ${isFullTime ? 'full-time' : 'part-time'}">
+                                    ${isFullTime ? '🏠 Full Time' : '⏰ Part Time'}
+                                </span>
+                            </td>
+                            <td style="font-size:12px;color:#888;">${submittedAt}</td>
+                            <td>
+                                <button onclick="verifyMaid('${m._id}')" class="approve-btn">
+                                    <i class="fas fa-check"></i> Approve
+                                </button>
+                                <button onclick="openRejectModal('${m._id}')" class="reject-btn">
+                                    <i class="fas fa-times"></i> Reject
+                                </button>
+                            </td>
+                        </tr>`;
+                }).join('');
+
+            } catch (err) { console.error("Error fetching pending maids:", err); }
+        }
+
+        async function verifyMaid(id) {
+            if (!confirm("Approve this maid? She will become visible to all users.")) return;
+            const res = await fetch('http://localhost:5000/admin/verify-maid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: 'Active' })
+            });
+            if (res.ok) { alert("Maid approved successfully!"); fetchPendingMaids(); }
+            else { alert("Error approving maid."); }
+        }
+
+        function openRejectModal(id) {
+            document.getElementById('rejectMaidId').value  = id;
+            document.getElementById('rejectReason').value  = '';
+            document.getElementById('rejectModal').classList.add('active');
+        }
+
+        function closeRejectModal() { document.getElementById('rejectModal').classList.remove('active'); }
+
+        async function confirmReject() {
+            const id     = document.getElementById('rejectMaidId').value;
+            const reason = document.getElementById('rejectReason').value.trim();
+            if (!reason) return alert("Please enter a rejection reason.");
+            const res = await fetch('http://localhost:5000/admin/verify-maid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id, status: 'Rejected', reason })
+            });
+            if (res.ok) { alert("Maid rejected."); closeRejectModal(); fetchPendingMaids(); }
+            else { alert("Error rejecting maid."); }
+        }
+
+        async function loadPendingBadge() {
+            try {
+                const res   = await fetch('http://localhost:5000/admin/pending-maids');
+                const maids = await res.json();
+                const badge = document.getElementById('pendingBadge');
+                if (maids.length > 0) {
+                    badge.style.display = 'inline-block';
+                    badge.innerText = maids.length;
+                }
+            } catch (err) {}
+        }
+
         fetchAllBookings();
+        loadPendingBadge();
     </script>
 </body>
 </html>

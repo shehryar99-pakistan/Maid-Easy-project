@@ -146,6 +146,17 @@
             font-weight: 600;
         }
 
+        /* NEW: Forgot password link */
+        .forgot-link {
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #888;
+            text-decoration: none;
+            transition: 0.2s;
+        }
+        .forgot-link:hover { color: var(--primary); }
+
         .back-home {
             display: inline-block;
             margin-top: 20px;
@@ -165,10 +176,8 @@
 
     <div class="login-wrapper">
 
-        <!-- LEFT: Image only, no tagline box -->
         <div class="left-panel"></div>
 
-        <!-- RIGHT: Login Form -->
         <div class="login-card">
             <div class="logo-section">
                 <div class="logo-icon">M</div>
@@ -194,6 +203,11 @@
                 Don't have an account? <a href="register.html">Create Account</a>
             </div>
 
+            <!-- NEW: Forgot Password link -->
+            <a href="forgot-password.html" class="forgot-link">
+                🔑 Forgot Password?
+            </a>
+
             <a href="index.html" class="back-home"><i class="fas fa-arrow-left"></i> Back to Home</a>
         </div>
 
@@ -218,11 +232,14 @@
                 if (response.ok) {
                     alert("Login Successful!");
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userEmail', email); 
-                    
+                    localStorage.setItem('userEmail', email);
+
                     if (data.role && data.role.toLowerCase() === 'admin') {
                         localStorage.setItem('userRole', 'admin');
                         window.location.href = "admin.html";
+                    } else if (data.role && data.role.toLowerCase() === 'agent') {
+                        localStorage.setItem('userRole', 'agent');
+                        window.location.href = "agent.html";
                     } else {
                         localStorage.setItem('userRole', 'user');
                         window.location.href = "dashboard.html";

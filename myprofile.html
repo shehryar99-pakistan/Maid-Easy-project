@@ -8,280 +8,60 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --primary: #0062ff; --gold: #ffb400; --dark: #1a1a1a; --bg: #f4f8ff; }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--bg);
-            min-height: 100vh;
-            padding: 30px 20px;
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 900px;
-            margin: 0 auto 30px auto;
-            padding: 12px 24px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); min-height: 100vh; padding: 30px 20px; }
+        nav { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 0 auto 30px auto; padding: 12px 24px; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .logo-text { font-size: 22px; font-weight: 700; color: var(--primary); }
         .logo-text span { color: var(--gold); }
-
-        .back-btn {
-            background: var(--primary);
-            color: white;
-            padding: 9px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
+        .back-btn { background: var(--primary); color: white; padding: 9px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s; }
         .back-btn:hover { background: #004dc7; }
-
-        .profile-wrapper {
-            max-width: 900px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 25px;
-            align-items: start;
-        }
-
-        .left-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,98,255,0.08);
-            padding: 35px 25px;
-            text-align: center;
-        }
-
-        .avatar-wrapper {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px auto;
-            cursor: pointer;
-        }
-
-        .avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            background: #e0e7ff;
-            background-size: cover;
-            background-position: center;
-            border: 4px solid var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: #a0b4ff;
-            overflow: hidden;
-        }
-
-        .avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            display: none;
-        }
-
-        .edit-overlay {
-            position: absolute;
-            bottom: 4px;
-            right: 4px;
-            width: 32px;
-            height: 32px;
-            background: var(--primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 13px;
-            box-shadow: 0 2px 8px rgba(0,98,255,0.4);
-            transition: 0.3s;
-        }
-
+        .profile-wrapper { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 280px 1fr; gap: 25px; align-items: start; }
+        .left-card { background: white; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,98,255,0.08); padding: 35px 25px; text-align: center; }
+        .avatar-wrapper { position: relative; width: 120px; height: 120px; margin: 0 auto 20px auto; cursor: pointer; }
+        .avatar { width: 120px; height: 120px; border-radius: 50%; background: #e0e7ff; border: 4px solid var(--primary); display: flex; align-items: center; justify-content: center; font-size: 48px; color: #a0b4ff; overflow: hidden; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none; }
+        .edit-overlay { position: absolute; bottom: 4px; right: 4px; width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; box-shadow: 0 2px 8px rgba(0,98,255,0.4); transition: 0.3s; }
         .edit-overlay:hover { background: #004dc7; transform: scale(1.1); }
-
         #picUpload { display: none; }
-
         .user-name { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
         .user-email { font-size: 13px; color: #888; margin-bottom: 20px; word-break: break-all; }
-
-        .profile-badge {
-            display: inline-block;
-            background: #e8f0ff;
-            color: var(--primary);
-            font-size: 12px;
-            font-weight: 600;
-            padding: 5px 14px;
-            border-radius: 20px;
-        }
-
-        .right-card {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0,98,255,0.08);
-            padding: 35px;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-            padding-bottom: 18px;
-            border-bottom: 2px solid #f0f4ff;
-        }
-
-        .card-header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
+        .profile-badge { display: inline-block; background: #e8f0ff; color: var(--primary); font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; }
+        .right-card { background: white; border-radius: 20px; box-shadow: 0 8px 24px rgba(0,98,255,0.08); padding: 35px; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; padding-bottom: 18px; border-bottom: 2px solid #f0f4ff; }
+        .card-header-left { display: flex; align-items: center; gap: 12px; }
         .card-header i { color: var(--primary); font-size: 20px; }
         .card-header h2 { font-size: 18px; font-weight: 700; color: var(--dark); }
-
-        .edit-toggle-btn {
-            background: #f0f5ff;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-            padding: 8px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
+        .edit-toggle-btn { background: #f0f5ff; color: var(--primary); border: 1.5px solid var(--primary); padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: 'Poppins', sans-serif; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 6px; }
         .edit-toggle-btn:hover { background: var(--primary); color: white; }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
-            margin-bottom: 18px;
-        }
-
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
         .input-group.full { grid-column: 1 / -1; }
-
-        .input-group label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-group input {
-            padding: 11px 14px;
-            border: 1.5px solid #e0e7ff;
-            border-radius: 10px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            color: var(--dark);
-            background: #f8faff;
-            outline: none;
-            transition: 0.2s;
-            width: 100%;
-        }
-
-        .input-group input:disabled {
-            background: #f4f8ff;
-            color: #888;
-            border-color: #eee;
-            cursor: not-allowed;
-        }
-
-        .input-group input:focus {
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0,98,255,0.08);
-        }
-
-        .save-btn {
-            width: 100%;
-            padding: 13px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .save-btn:hover {
-            background: #004dc7;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,98,255,0.3);
-        }
-
+        .input-group label { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        .input-group input { padding: 11px 14px; border: 1.5px solid #e0e7ff; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--dark); background: #f8faff; outline: none; transition: 0.2s; width: 100%; }
+        .input-group input:disabled { background: #f4f8ff; color: #888; border-color: #eee; cursor: not-allowed; }
+        .input-group input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(0,98,255,0.08); }
+        .save-btn { width: 100%; padding: 13px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; font-family: 'Poppins', sans-serif; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; }
+        .save-btn:hover { background: #004dc7; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,98,255,0.3); }
         #saveSection { display: none; }
-
-        #imgModal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.75);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-
+        .password-section { margin-top: 25px; padding-top: 25px; border-top: 2px solid #f0f4ff; }
+        .password-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .password-header i { color: var(--primary); font-size: 18px; }
+        .password-header h3 { font-size: 16px; font-weight: 700; color: var(--dark); }
+        .password-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+        .pass-input-wrap { position: relative; }
+        .pass-input-wrap input { padding-right: 44px; }
+        .pass-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #aaa; font-size: 15px; transition: 0.2s; }
+        .pass-toggle:hover { color: var(--primary); }
+        .change-pass-btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 12px; font-size: 14px; font-weight: 600; font-family: 'Poppins', sans-serif; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 6px; }
+        .change-pass-btn:hover { background: #219a52; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(39,174,96,0.3); }
+        .pass-msg { font-size: 13px; font-weight: 600; padding: 10px 14px; border-radius: 8px; margin-top: 10px; display: none; }
+        .pass-msg.success { background: #e6f9f0; color: #27ae60; }
+        .pass-msg.error   { background: #ffe8e8; color: #e74c3c; }
+        #imgModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; justify-content: center; align-items: center; }
         #imgModal.active { display: flex; }
-
-        #imgModal img {
-            width: 320px;
-            height: 320px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid white;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-        }
-
-        #imgModal .close-modal {
-            position: absolute;
-            top: 30px;
-            right: 40px;
-            color: white;
-            font-size: 32px;
-            cursor: pointer;
-        }
-
-        @media (max-width: 700px) {
-            .profile-wrapper { grid-template-columns: 1fr; }
-            .form-grid { grid-template-columns: 1fr; }
-        }
+        #imgModal img { width: 320px; height: 320px; border-radius: 50%; object-fit: cover; border: 5px solid white; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        #imgModal .close-modal { position: absolute; top: 30px; right: 40px; color: white; font-size: 32px; cursor: pointer; }
+        @media (max-width: 700px) { .profile-wrapper { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -292,27 +72,19 @@
     </nav>
 
     <div class="profile-wrapper">
-
         <div class="left-card">
             <div class="avatar-wrapper" onclick="document.getElementById('picUpload').click()">
                 <div class="avatar" id="avatarPreview">
                     <i class="fas fa-user" id="avatarIcon"></i>
                     <img id="avatarImg" src="" alt="Profile">
                 </div>
-                <div class="edit-overlay">
-                    <i class="fas fa-camera"></i>
-                </div>
+                <div class="edit-overlay"><i class="fas fa-camera"></i></div>
             </div>
-
             <input type="file" id="picUpload" accept="image/*" onchange="previewImage(event)">
-
             <div class="user-name" id="displayName">Your Name</div>
             <div class="user-email" id="displayEmail"></div>
             <span class="profile-badge"><i class="fas fa-shield-alt"></i> Verified User</span>
-
-            <p style="font-size:12px; color:#aaa; margin-top:16px;">
-                <i class="fas fa-camera"></i> Click photo to change
-            </p>
+            <p style="font-size:12px; color:#aaa; margin-top:16px;"><i class="fas fa-camera"></i> Click photo to change</p>
         </div>
 
         <div class="right-card">
@@ -327,22 +99,10 @@
             </div>
 
             <div class="form-grid">
-                <div class="input-group">
-                    <label>First Name</label>
-                    <input type="text" id="firstName" placeholder="First name" disabled>
-                </div>
-                <div class="input-group">
-                    <label>Last Name</label>
-                    <input type="text" id="lastName" placeholder="Last name" disabled>
-                </div>
-                <div class="input-group">
-                    <label>Phone Number</label>
-                    <input type="text" id="phone" placeholder="03XX-XXXXXXX" disabled>
-                </div>
-                <div class="input-group">
-                    <label>Email Address</label>
-                    <input type="email" id="emailField" placeholder="Your email" disabled>
-                </div>
+                <div class="input-group"><label>First Name</label><input type="text" id="firstName" placeholder="First name" disabled></div>
+                <div class="input-group"><label>Last Name</label><input type="text" id="lastName" placeholder="Last name" disabled></div>
+                <div class="input-group"><label>Phone Number</label><input type="text" id="phone" placeholder="03XX-XXXXXXX" disabled></div>
+                <div class="input-group"><label>Email Address</label><input type="email" id="emailField" placeholder="Your email" disabled></div>
             </div>
 
             <div id="saveSection">
@@ -350,8 +110,42 @@
                     <i class="fas fa-save"></i> Save Changes
                 </button>
             </div>
-        </div>
 
+            <!-- NEW: Change Password Section -->
+            <div class="password-section">
+                <div class="password-header">
+                    <i class="fas fa-lock"></i>
+                    <h3>Change Password</h3>
+                </div>
+                <div class="password-grid">
+                    <div class="input-group">
+                        <label>Current Password</label>
+                        <div class="pass-input-wrap">
+                            <input type="password" id="currentPass" placeholder="Enter current password">
+                            <button class="pass-toggle" onclick="togglePass('currentPass', this)" type="button"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>New Password</label>
+                        <div class="pass-input-wrap">
+                            <input type="password" id="newPass" placeholder="Enter new password (min 8 chars)">
+                            <button class="pass-toggle" onclick="togglePass('newPass', this)" type="button"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Confirm New Password</label>
+                        <div class="pass-input-wrap">
+                            <input type="password" id="confirmNewPass" placeholder="Confirm new password">
+                            <button class="pass-toggle" onclick="togglePass('confirmNewPass', this)" type="button"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <button class="change-pass-btn" onclick="changePassword()">
+                    <i class="fas fa-key"></i> Update Password
+                </button>
+                <div class="pass-msg" id="passMsg"></div>
+            </div>
+        </div>
     </div>
 
     <div id="imgModal">
@@ -364,7 +158,7 @@
         document.getElementById('displayEmail').innerText = email || '';
 
         let isEditing = false;
-        let originalPhone = ''; // NEW: purana phone store karo
+        let originalPhone = '';
 
         function toggleEdit() {
             isEditing = !isEditing;
@@ -373,9 +167,7 @@
             const saveSection = document.getElementById('saveSection');
 
             if (isEditing) {
-                // Phone ka purana value store karo comparison ke liye
                 originalPhone = document.getElementById('phone').value;
-
                 fields.forEach(id => document.getElementById(id).disabled = false);
                 btn.innerHTML = '<i class="fas fa-times"></i> Cancel';
                 btn.style.background = '#fff0f0';
@@ -398,7 +190,7 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onloadend = () => {
-                const img = document.getElementById('avatarImg');
+                const img  = document.getElementById('avatarImg');
                 const icon = document.getElementById('avatarIcon');
                 img.src = reader.result;
                 img.style.display = 'block';
@@ -414,26 +206,20 @@
             document.getElementById('imgModal').classList.add('active');
         });
 
-        function closeModal() {
-            document.getElementById('imgModal').classList.remove('active');
-        }
+        function closeModal() { document.getElementById('imgModal').classList.remove('active'); }
 
         async function fetchProfile() {
             if (!email) return;
             const res = await fetch(`http://localhost:5000/get-profile?email=${email}`);
             if (!res.ok) return;
             const user = await res.json();
-
-            document.getElementById('firstName').value = user.firstName || '';
-            document.getElementById('lastName').value  = user.lastName  || '';
-            document.getElementById('phone').value     = user.phone     || '';
-            document.getElementById('emailField').value = user.email    || email;
-
-            originalPhone = user.phone || ''; // Store original phone
-
+            document.getElementById('firstName').value  = user.firstName || '';
+            document.getElementById('lastName').value   = user.lastName  || '';
+            document.getElementById('phone').value      = user.phone     || '';
+            document.getElementById('emailField').value = user.email     || email;
+            originalPhone = user.phone || '';
             const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
             document.getElementById('displayName').innerText = fullName || 'Your Name';
-
             if (user.profilePic) {
                 const img  = document.getElementById('avatarImg');
                 const icon = document.getElementById('avatarIcon');
@@ -443,13 +229,12 @@
             }
         }
 
-        // UPDATED: updateProfile with notifications
         async function updateProfile() {
-            const fileInput  = document.getElementById('picUpload');
-            const file       = fileInput.files[0];
-            const newPhone   = document.getElementById('phone').value;
-            const newFirst   = document.getElementById('firstName').value;
-            const newLast    = document.getElementById('lastName').value;
+            const fileInput = document.getElementById('picUpload');
+            const file      = fileInput.files[0];
+            const newPhone  = document.getElementById('phone').value;
+            const newFirst  = document.getElementById('firstName').value;
+            const newLast   = document.getElementById('lastName').value;
 
             let base64Image = null;
             if (file) {
@@ -461,13 +246,9 @@
             }
 
             const data = {
-                email:      email,
-                firstName:  newFirst,
-                lastName:   newLast,
-                phone:      newPhone,
-                address:    document.getElementById('emailField').value,
-                // NEW: notification triggers
-                oldPhone:   originalPhone,
+                email, firstName: newFirst, lastName: newLast, phone: newPhone,
+                address: document.getElementById('emailField').value,
+                oldPhone: originalPhone,
                 profilePic: base64Image || undefined
             };
 
@@ -477,7 +258,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
-
                 if (res.ok) {
                     alert("Profile Updated Successfully!");
                     isEditing = false;
@@ -487,8 +267,67 @@
                     alert("Update Failed. Please try again.");
                 }
             } catch (err) {
-                console.error("Error:", err);
                 alert("Server error, make sure backend is running.");
+            }
+        }
+
+        function togglePass(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            } else {
+                input.type = 'password';
+                btn.innerHTML = '<i class="fas fa-eye"></i>';
+            }
+        }
+
+        async function changePassword() {
+            const currentPass    = document.getElementById('currentPass').value;
+            const newPass        = document.getElementById('newPass').value;
+            const confirmNewPass = document.getElementById('confirmNewPass').value;
+            const msgDiv         = document.getElementById('passMsg');
+            msgDiv.style.display = 'none';
+
+            if (!currentPass || !newPass || !confirmNewPass) {
+                msgDiv.className = 'pass-msg error';
+                msgDiv.innerText = '❌ Please fill all password fields.';
+                msgDiv.style.display = 'block'; return;
+            }
+            if (newPass.length < 8) {
+                msgDiv.className = 'pass-msg error';
+                msgDiv.innerText = '❌ New password must be at least 8 characters.';
+                msgDiv.style.display = 'block'; return;
+            }
+            if (newPass !== confirmNewPass) {
+                msgDiv.className = 'pass-msg error';
+                msgDiv.innerText = '❌ New passwords do not match.';
+                msgDiv.style.display = 'block'; return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:5000/change-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, currentPassword: currentPass, newPassword: newPass })
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    msgDiv.className = 'pass-msg success';
+                    msgDiv.innerText = '✅ Password changed successfully!';
+                    msgDiv.style.display = 'block';
+                    document.getElementById('currentPass').value    = '';
+                    document.getElementById('newPass').value        = '';
+                    document.getElementById('confirmNewPass').value = '';
+                } else {
+                    msgDiv.className = 'pass-msg error';
+                    msgDiv.innerText = result.message || '❌ Password change failed.';
+                    msgDiv.style.display = 'block';
+                }
+            } catch (err) {
+                msgDiv.className = 'pass-msg error';
+                msgDiv.innerText = '❌ Server error. Please try again.';
+                msgDiv.style.display = 'block';
             }
         }
 

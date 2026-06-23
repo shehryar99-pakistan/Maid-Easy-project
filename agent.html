@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Dashboard | MaidEasy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primary: #0062ff; --gold: #ffb400; --dark: #1a1a1a; --bg: #f4f8ff; --sidebar: #1e2a3a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Poppins', sans-serif; display: flex; min-height: 100vh; background: var(--bg); }
+
+        .sidebar { width: 240px; background: var(--sidebar); color: white; padding: 30px 20px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+        .sidebar-logo { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+        .sidebar-logo .maid { color: var(--primary); }
+        .sidebar-logo .easy { color: var(--gold); }
+        .sidebar-role { font-size: 11px; color: #aaa; margin-bottom: 35px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-menu { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .menu-item { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-radius: 10px; color: #aaa; font-size: 14px; font-weight: 500; transition: 0.2s; cursor: pointer; border: none; background: none; width: 100%; font-family: 'Poppins', sans-serif; }
+        .menu-item:hover, .menu-item.active { background: rgba(255,255,255,0.08); color: white; }
+        .menu-item i { width: 18px; font-size: 15px; }
+        .menu-item.logout-item { color: #ff6b6b; margin-top: auto; }
+        .menu-item.logout-item:hover { background: rgba(255,107,107,0.1); }
+
+        .main { margin-left: 240px; flex: 1; padding: 30px; }
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .welcome-banner { background: linear-gradient(135deg, #0062ff 0%, #0040cc 100%); border-radius: 20px; padding: 28px 32px; color: white; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; }
+        .welcome-banner h2 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+        .welcome-banner p { font-size: 13px; opacity: 0.85; }
+        .welcome-banner .icon-wrap { width: 60px; height: 60px; background: rgba(255,255,255,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 28px; }
+        .stat-card { background: white; border-radius: 14px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 4px 15px rgba(0,98,255,0.06); }
+        .stat-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .stat-icon.blue   { background: #e8f0ff; color: var(--primary); }
+        .stat-icon.green  { background: #e6f9f0; color: #27ae60; }
+        .stat-icon.yellow { background: #fff8e6; color: #f39c12; }
+        .stat-icon.red    { background: #ffe8e8; color: #e74c3c; }
+        .stat-info p  { font-size: 12px; color: #888; }
+        .stat-info h3 { font-size: 22px; font-weight: 700; color: var(--dark); }
+
+        .card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,98,255,0.06); overflow: hidden; margin-bottom: 25px; }
+        .card-header { padding: 16px 22px; border-bottom: 2px solid #f0f4ff; display: flex; align-items: center; gap: 10px; }
+        .card-header i { color: var(--primary); }
+        .card-header h3 { font-size: 15px; font-weight: 700; color: var(--dark); flex: 1; }
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .section-header h2 { font-size: 20px; font-weight: 700; color: var(--dark); }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 22px; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input, .form-group select { padding: 11px 14px; border: 1.5px solid #e0e7ff; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--dark); background: #f8faff; outline: none; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(0,98,255,0.08); }
+
+        .cnic-section { grid-column: 1 / -1; background: #f8faff; border: 1.5px solid #e0e7ff; border-radius: 12px; padding: 18px; }
+        .cnic-section h4 { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .cnic-section h4 i { color: var(--primary); }
+        .cnic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+        .upload-box { border: 2px dashed #c0d0ff; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: white; position: relative; }
+        .upload-box:hover { border-color: var(--primary); background: #f0f5ff; }
+        .upload-box.uploaded { border-color: #27ae60; border-style: solid; background: #f0faf5; }
+        .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .upload-box i { font-size: 28px; color: #b0c0ff; margin-bottom: 8px; display: block; }
+        .upload-box.uploaded i { color: #27ae60; }
+        .upload-box p { font-size: 12px; color: #888; font-weight: 500; margin: 0; }
+        .upload-box .upload-label { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
+        .upload-box.uploaded .upload-label { color: #27ae60; }
+        .cnic-preview { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #d0e8d0; }
+
+        .submit-btn { margin: 0 22px 22px 22px; padding: 13px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 44px); }
+        .submit-btn:hover { background: #004dc7; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,98,255,0.3); }
+        .submit-btn:disabled { background: #aaa; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: #f8faff; }
+        th { padding: 13px 18px; text-align: left; font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #f0f4ff; }
+        td { padding: 14px 18px; font-size: 13px; color: var(--dark); border-bottom: 1px solid #f5f7ff; }
+        tbody tr:hover { background: #f8faff; }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+        .status-badge.active   { background: #e6f9f0; color: #27ae60; }
+        .status-badge.pending  { background: #fff8e6; color: #f39c12; }
+        .status-badge.rejected { background: #ffe8e8; color: #e74c3c; }
+        .type-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .type-badge.full-time { background: #1a1a1a; color: #ffb400; }
+        .type-badge.part-time { background: #e8f0ff; color: var(--primary); }
+
+        .empty-state { text-align: center; padding: 50px 20px; color: #bbb; }
+        .empty-state i { font-size: 48px; color: #d0d8ff; display: block; margin-bottom: 14px; }
+        .empty-state h3 { font-size: 16px; color: #aaa; font-weight: 600; margin-bottom: 6px; }
+        .empty-state p  { font-size: 13px; }
+
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #27ae60; color: white; padding: 14px 22px; border-radius: 12px; font-size: 14px; font-weight: 600; display: none; align-items: center; gap: 10px; box-shadow: 0 8px 24px rgba(39,174,96,0.4); z-index: 9999; }
+        .toast.show { display: flex; }
+        .toast.error { background: #e74c3c; box-shadow: 0 8px 24px rgba(231,76,60,0.4); }
+
+        .rejection-box { background: #ffe8e8; border-left: 3px solid #e74c3c; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #c0392b; margin-top: 6px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-logo"><span class="maid">Maid</span><span class="easy">Easy</span></div>
+    <div class="sidebar-role">Agent Dashboard</div>
+    <div class="sidebar-menu">
+        <button class="menu-item active" onclick="showSection('overview', this)"><i class="fas fa-chart-pie"></i> Overview</button>
+        <button class="menu-item" onclick="showSection('submit', this)"><i class="fas fa-user-plus"></i> Submit Maid</button>
+        <button class="menu-item" onclick="showSection('mymaids', this)"><i class="fas fa-users"></i> My Submissions</button>
+        <button class="menu-item logout-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+</div>
+
+<div class="main">
+
+    <!-- OVERVIEW -->
+    <div class="section active" id="section-overview">
+        <div class="welcome-banner">
+            <div>
+                <h2>Welcome, <span id="agentName">Agent</span>! 👋</h2>
+                <p>Submit maid profiles for admin verification and track their status here.</p>
+            </div>
+            <div class="icon-wrap"><i class="fas fa-user-tie"></i></div>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-users"></i></div><div class="stat-info"><p>Total Submitted</p><h3 id="statTotal">0</h3></div></div>
+            <div class="stat-card"><div class="stat-icon green"><i class="fas fa-check-circle"></i></div><div class="stat-info"><p>Approved</p><h3 id="statApproved">0</h3></div></div>
+            <div class="stat-card"><div class="stat-icon yellow"><i class="fas fa-clock"></i></div><div class="stat-info"><p>Pending</p><h3 id="statPending">0</h3></div></div>
+            <div class="stat-card"><div class="stat-icon red"><i class="fas fa-times-circle"></i></div><div class="stat-info"><p>Rejected</p><h3 id="statRejected">0</h3></div></div>
+        </div>
+        <div class="card">
+            <div class="card-header"><i class="fas fa-history"></i><h3>Recent Submissions</h3></div>
+            <table>
+                <thead><tr><th>#</th><th>Maid Name</th><th>Location</th><th>Category</th><th>Type</th><th>Status</th><th>Submitted</th></tr></thead>
+                <tbody id="overviewBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SUBMIT MAID -->
+    <div class="section" id="section-submit">
+        <div class="section-header"><h2>Submit New Maid</h2></div>
+        <div class="card">
+            <div class="card-header"><i class="fas fa-user-plus"></i><h3>Maid Details</h3></div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Maid Full Name</label>
+                    <input type="text" id="sName" placeholder="e.g. Fatima Bibi">
+                </div>
+                <div class="form-group">
+                    <label>Service</label>
+                    <input type="text" id="sService" placeholder="e.g. House Cleaning">
+                </div>
+                <div class="form-group">
+                    <label>Price</label>
+                    <input type="text" id="sPrice" placeholder="e.g. 500 PKR/hr">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <input type="text" id="sLocation" placeholder="e.g. Gulberg, Lahore">
+                </div>
+                <div class="form-group">
+                    <label>Service Category</label>
+                    <input type="text" id="sCategory" placeholder="e.g. Cook, Cleaner, Nanny">
+                </div>
+                <div class="form-group">
+                    <label>Profile Image URL</label>
+                    <input type="text" id="sImage" placeholder="Paste maid photo URL">
+                </div>
+                <div class="form-group">
+                    <label>Maid Type</label>
+                    <select id="sMaidType">
+                        <option value="part-time">⏰ Part Time</option>
+                        <option value="full-time">🏠 Full Time</option>
+                    </select>
+                </div>
+
+                <!-- CNIC UPLOAD -->
+                <div class="cnic-section">
+                    <h4><i class="fas fa-id-card"></i> CNIC Documents — Upload from Gallery or Camera</h4>
+                    <div class="cnic-grid">
+                        <div>
+                            <div class="upload-box" id="frontBox">
+                                <input type="file" id="cnicFrontFile" accept="image/*" onchange="handleCnicUpload('cnicFrontFile', 'previewFront', 'frontBox', 'frontStatus')">
+                                <i class="fas fa-id-card"></i>
+                                <div class="upload-label">CNIC Front Side</div>
+                                <p>Tap to upload from gallery or camera</p>
+                            </div>
+                            <img id="previewFront" class="cnic-preview" alt="CNIC Front Preview">
+                            <p id="frontStatus" style="font-size:11px;color:#27ae60;margin-top:4px;display:none;"><i class="fas fa-check"></i> Front uploaded</p>
+                        </div>
+                        <div>
+                            <div class="upload-box" id="backBox">
+                                <input type="file" id="cnicBackFile" accept="image/*" onchange="handleCnicUpload('cnicBackFile', 'previewBack', 'backBox', 'backStatus')">
+                                <i class="fas fa-id-card"></i>
+                                <div class="upload-label">CNIC Back Side</div>
+                                <p>Tap to upload from gallery or camera</p>
+                            </div>
+                            <img id="previewBack" class="cnic-preview" alt="CNIC Back Preview">
+                            <p id="backStatus" style="font-size:11px;color:#27ae60;margin-top:4px;display:none;"><i class="fas fa-check"></i> Back uploaded</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="submit-btn" id="submitBtn" onclick="submitMaid()">
+                <i class="fas fa-paper-plane"></i> Submit for Admin Verification
+            </button>
+        </div>
+    </div>
+
+    <!-- MY SUBMISSIONS -->
+    <div class="section" id="section-mymaids">
+        <div class="section-header"><h2>My Submissions</h2></div>
+        <div class="card">
+            <div class="card-header"><i class="fas fa-list-alt"></i><h3>All Submitted Maids</h3></div>
+            <table>
+                <thead><tr><th>#</th><th>Maid Name</th><th>Location</th><th>Category</th><th>Type</th><th>Status</th><th>Submitted At</th></tr></thead>
+                <tbody id="myMaidsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastMsg"></span></div>
+
+<script>
+    if (localStorage.getItem('isLoggedIn') !== 'true' || localStorage.getItem('userRole') !== 'agent') {
+        window.location.href = 'index.html';
+    }
+
+    const agentEmail = localStorage.getItem('userEmail') || '';
+    document.getElementById('agentName').innerText = agentEmail.split('@')[0] || 'Agent';
+
+    function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+    function showSection(name, btn) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+        document.getElementById('section-' + name).classList.add('active');
+        if (btn) btn.classList.add('active');
+        if (name === 'overview') loadOverview();
+        if (name === 'mymaids') loadMyMaids();
+    }
+
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMsg').innerText = msg;
+        toast.className = 'toast show' + (isError ? ' error' : '');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    function handleCnicUpload(inputId, previewId, boxId, statusId) {
+        const file    = document.getElementById(inputId).files[0];
+        const preview = document.getElementById(previewId);
+        const box     = document.getElementById(boxId);
+        const status  = document.getElementById(statusId);
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
+        reader.readAsDataURL(file);
+        box.classList.add('uploaded');
+        status.style.display = 'block';
+    }
+
+    async function uploadCnicFiles() {
+        const frontFile = document.getElementById('cnicFrontFile').files[0];
+        const backFile  = document.getElementById('cnicBackFile').files[0];
+        if (!frontFile && !backFile) return { cnicFront: '', cnicBack: '' };
+        const formData = new FormData();
+        if (frontFile) formData.append('cnicFront', frontFile);
+        if (backFile)  formData.append('cnicBack',  backFile);
+        const res  = await fetch('http://localhost:5000/agent/upload-cnic', { method: 'POST', body: formData });
+        const data = await res.json();
+        return data;
+    }
+
+    function statusBadge(status) {
+        const s     = (status || 'Pending').toLowerCase();
+        const icons = { active: 'fa-check-circle', pending: 'fa-clock', rejected: 'fa-times-circle' };
+        const label = status === 'Active' ? 'Approved' : status;
+        return `<span class="status-badge ${s}"><i class="fas ${icons[s] || 'fa-clock'}"></i> ${label}</span>`;
+    }
+
+    async function loadOverview() {
+        try {
+            const res   = await fetch(`http://localhost:5000/agent/my-maids?email=${agentEmail}`);
+            const maids = await res.json();
+            document.getElementById('statTotal').innerText    = maids.length;
+            document.getElementById('statApproved').innerText = maids.filter(m => m.verificationStatus === 'Active').length;
+            document.getElementById('statPending').innerText  = maids.filter(m => m.verificationStatus === 'Pending').length;
+            document.getElementById('statRejected').innerText = maids.filter(m => m.verificationStatus === 'Rejected').length;
+            const tbody = document.getElementById('overviewBody');
+            if (maids.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-users"></i><h3>No Submissions Yet</h3><p>Submit your first maid from the Submit Maid section.</p></div></td></tr>`;
+                return;
+            }
+            const recent = maids.slice(-5).reverse();
+            tbody.innerHTML = recent.map((m, i) => {
+                const isFullTime  = m.maidType === 'full-time';
+                const submittedAt = m.submittedAt ? new Date(m.submittedAt).toLocaleDateString() : 'N/A';
+                return `
+                    <tr>
+                        <td style="color:#aaa;font-size:13px;">${i + 1}</td>
+                        <td><strong>${m.name}</strong></td>
+                        <td>${m.location || 'N/A'}</td>
+                        <td>${m.serviceCategory || 'N/A'}</td>
+                        <td><span class="type-badge ${isFullTime ? 'full-time' : 'part-time'}">${isFullTime ? '🏠 Full Time' : '⏰ Part Time'}</span></td>
+                        <td>${statusBadge(m.verificationStatus)}</td>
+                        <td style="font-size:12px;color:#888;">${submittedAt}</td>
+                    </tr>`;
+            }).join('');
+        } catch (err) { console.error(err); }
+    }
+
+    async function loadMyMaids() {
+        try {
+            const res   = await fetch(`http://localhost:5000/agent/my-maids?email=${agentEmail}`);
+            const maids = await res.json();
+            const tbody = document.getElementById('myMaidsBody');
+            if (maids.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><i class="fas fa-clipboard-list"></i><h3>No Submissions Yet</h3><p>Go to Submit Maid to add your first maid.</p></div></td></tr>`;
+                return;
+            }
+            tbody.innerHTML = maids.map((m, i) => {
+                const isFullTime  = m.maidType === 'full-time';
+                const submittedAt = m.submittedAt ? new Date(m.submittedAt).toLocaleDateString() : 'N/A';
+                let statusCell    = statusBadge(m.verificationStatus);
+                if (m.verificationStatus === 'Rejected' && m.rejectionReason) {
+                    statusCell += `<div class="rejection-box"><i class="fas fa-exclamation-circle"></i> Reason: ${m.rejectionReason}</div>`;
+                }
+                return `
+                    <tr>
+                        <td style="color:#aaa;font-size:13px;">${i + 1}</td>
+                        <td><strong>${m.name}</strong></td>
+                        <td>${m.location || 'N/A'}</td>
+                        <td>${m.serviceCategory || 'N/A'}</td>
+                        <td><span class="type-badge ${isFullTime ? 'full-time' : 'part-time'}">${isFullTime ? '🏠 Full Time' : '⏰ Part Time'}</span></td>
+                        <td>${statusCell}</td>
+                        <td style="font-size:12px;color:#888;">${submittedAt}</td>
+                    </tr>`;
+            }).join('');
+        } catch (err) { console.error(err); }
+    }
+
+    async function submitMaid() {
+        const name     = document.getElementById('sName').value.trim();
+        const service  = document.getElementById('sService').value.trim();
+        const price    = document.getElementById('sPrice').value.trim();
+        const location = document.getElementById('sLocation').value.trim();
+        const category = document.getElementById('sCategory').value.trim();
+        const image    = document.getElementById('sImage').value.trim();
+        const maidType = document.getElementById('sMaidType').value;
+
+        if (!name || !location || !category) {
+            showToast('Please fill Name, Location and Category!', true);
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            const { cnicFront, cnicBack } = await uploadCnicFiles();
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            const res = await fetch('http://localhost:5000/agent/submit-maid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, service, price, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })
+            });
+
+            const result = await res.json();
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
+
+            if (res.ok) {
+                showToast('Maid submitted successfully! Awaiting admin verification.');
+                ['sName','sService','sPrice','sLocation','sCategory','sImage'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('sMaidType').value = 'part-time';
+                document.getElementById('cnicFrontFile').value = '';
+                document.getElementById('cnicBackFile').value  = '';
+                document.getElementById('previewFront').style.display = 'none';
+                document.getElementById('previewBack').style.display  = 'none';
+                document.getElementById('frontBox').classList.remove('uploaded');
+                document.getElementById('backBox').classList.remove('uploaded');
+                document.getElementById('frontStatus').style.display = 'none';
+                document.getElementById('backStatus').style.display  = 'none';
+            } else {
+                showToast(result.message || 'Submission failed.', true);
+            }
+        } catch (err) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
+            showToast('Server error. Please try again.', true);
+        }
+    }
+
+    loadOverview();
+</script>
+</body>
+</html>
