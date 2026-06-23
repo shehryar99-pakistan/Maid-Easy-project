@@ -275,7 +275,7 @@
         const formData = new FormData();
         if (frontFile) formData.append('cnicFront', frontFile);
         if (backFile)  formData.append('cnicBack',  backFile);
-        const res  = await fetch('http://localhost:5000/agent/upload-cnic', { method: 'POST', body: formData });
+        const res  = await fetch('https://maid-easy-project.onrender.com/agent/upload-cnic', { method: 'POST', body: formData });
         const data = await res.json();
         return data;
     }
@@ -289,7 +289,7 @@
 
     async function loadOverview() {
         try {
-            const res   = await fetch(`http://localhost:5000/agent/my-maids?email=${agentEmail}`);
+            const res   = await fetch(`https://maid-easy-project.onrender.com/agent/my-maids?email=${agentEmail}`);
             const maids = await res.json();
             document.getElementById('statTotal').innerText    = maids.length;
             document.getElementById('statApproved').innerText = maids.filter(m => m.verificationStatus === 'Active').length;
@@ -320,7 +320,7 @@
 
     async function loadMyMaids() {
         try {
-            const res   = await fetch(`http://localhost:5000/agent/my-maids?email=${agentEmail}`);
+            const res   = await fetch(`https://maid-easy-project.onrender.com/agent/my-maids?email=${agentEmail}`);
             const maids = await res.json();
             const tbody = document.getElementById('myMaidsBody');
             if (maids.length === 0) {
@@ -370,7 +370,7 @@
             const { cnicFront, cnicBack } = await uploadCnicFiles();
 
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            const res = await fetch('http://localhost:5000/agent/submit-maid', {
+            const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, service, price, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })

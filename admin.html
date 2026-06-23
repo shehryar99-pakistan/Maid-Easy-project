@@ -723,7 +723,7 @@
 
         async function fetchAllBookings() {
             try {
-                const response = await fetch('http://localhost:5000/all-bookings');
+                const response = await fetch('https://maid-easy-project.onrender.com/all-bookings');
                 const bookings = await response.json();
                 const tbody = document.getElementById('adminBookingBody');
 
@@ -793,7 +793,7 @@
         }
 
         async function updateStatus(id, newStatus) {
-            await fetch('http://localhost:5000/update-booking', {
+            await fetch('https://maid-easy-project.onrender.com/update-booking', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, status: newStatus })
@@ -803,7 +803,7 @@
 
         async function cancelByAdmin(id) {
             if (!confirm("Are you sure? This will cancel the booking on maid's behalf.")) return;
-            const res = await fetch('http://localhost:5000/admin/cancel-booking', {
+            const res = await fetch('https://maid-easy-project.onrender.com/admin/cancel-booking', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, reason: 'Maid left the job' })
@@ -819,7 +819,7 @@
         let maidsData = [];
 
         async function fetchMaids() {
-            const res = await fetch('http://localhost:5000/maids');
+            const res = await fetch('https://maid-easy-project.onrender.com/maids');
             maidsData = await res.json();
             const grid = document.getElementById('maidGrid');
 
@@ -862,7 +862,7 @@
                 maidType: document.getElementById('mMaidType').value
             };
 
-            const res = await fetch('http://localhost:5000/admin/add-maid', {
+            const res = await fetch('https://maid-easy-project.onrender.com/admin/add-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(maidData)
@@ -910,7 +910,7 @@
                 maidType: document.getElementById('editMaidType').value
             };
 
-            const res = await fetch('http://localhost:5000/admin/update-maid', {
+            const res = await fetch('https://maid-easy-project.onrender.com/admin/update-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updatedData)
@@ -929,7 +929,7 @@
             const m = maidsData[index];
             if (!confirm(`Are you sure you want to delete ${m.name}?`)) return;
 
-            const res = await fetch('http://localhost:5000/admin/delete-maid', {
+            const res = await fetch('https://maid-easy-project.onrender.com/admin/delete-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: m._id })
@@ -945,7 +945,7 @@
 
         async function fetchPendingMaids() {
             try {
-                const res = await fetch('http://localhost:5000/admin/pending-maids');
+                const res = await fetch('https://maid-easy-project.onrender.com/admin/pending-maids');
                 const maids = await res.json();
                 const tbody = document.getElementById('pendingMaidBody');
 
@@ -999,7 +999,7 @@
 
         async function verifyMaid(id) {
             if (!confirm("Approve this maid? She will become visible to all users.")) return;
-            const res = await fetch('http://localhost:5000/admin/verify-maid', {
+            const res = await fetch('https://maid-easy-project.onrender.com/admin/verify-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, status: 'Active' })
@@ -1020,7 +1020,7 @@
             const id     = document.getElementById('rejectMaidId').value;
             const reason = document.getElementById('rejectReason').value.trim();
             if (!reason) return alert("Please enter a rejection reason.");
-            const res = await fetch('http://localhost:5000/admin/verify-maid', {
+            const res = await fetch('https://maid-easy-project.onrender.com/admin/verify-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id, status: 'Rejected', reason })
@@ -1031,7 +1031,7 @@
 
         async function loadPendingBadge() {
             try {
-                const res   = await fetch('http://localhost:5000/admin/pending-maids');
+                const res   = await fetch('https://maid-easy-project.onrender.com/admin/pending-maids');
                 const maids = await res.json();
                 const badge = document.getElementById('pendingBadge');
                 if (maids.length > 0) {

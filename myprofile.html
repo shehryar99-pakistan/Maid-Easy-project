@@ -210,7 +210,7 @@
 
         async function fetchProfile() {
             if (!email) return;
-            const res = await fetch(`http://localhost:5000/get-profile?email=${email}`);
+            const res = await fetch(`https://maid-easy-project.onrender.com/get-profile?email=${email}`);
             if (!res.ok) return;
             const user = await res.json();
             document.getElementById('firstName').value  = user.firstName || '';
@@ -253,7 +253,7 @@
             };
 
             try {
-                const res = await fetch('http://localhost:5000/update-profile', {
+                const res = await fetch('https://maid-easy-project.onrender.com/update-profile', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
@@ -306,7 +306,7 @@
             }
 
             try {
-                const res = await fetch('http://localhost:5000/change-password', {
+                const res = await fetch('https://maid-easy-project.onrender.com/change-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, currentPassword: currentPass, newPassword: newPass })

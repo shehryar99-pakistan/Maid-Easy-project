@@ -226,7 +226,7 @@
         const email = localStorage.getItem('userEmail');
         if (!email) return;
         try {
-            const res = await fetch(`http://localhost:5000/notifications?email=${email}`);
+            const res = await fetch(`https://maid-easy-project.onrender.com/notifications?email=${email}`);
             const data = await res.json();
             const { notifications, unreadCount } = data;
             const badge = document.getElementById('bellBadge');
@@ -267,7 +267,7 @@
         dropdown.classList.toggle('open');
         if (dropdown.classList.contains('open')) {
             const email = localStorage.getItem('userEmail');
-            await fetch('http://localhost:5000/notifications/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+            await fetch('https://maid-easy-project.onrender.com/notifications/read', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
             lastUnreadCount = 0;
             document.getElementById('bellBadge').style.display = 'none';
             document.querySelectorAll('.notif-item.unread').forEach(i => i.classList.remove('unread'));
@@ -277,7 +277,7 @@
 
     async function clearNotifications() {
         const email = localStorage.getItem('userEmail');
-        await fetch(`http://localhost:5000/notifications/clear?email=${email}`, { method: 'DELETE' });
+        await fetch(`https://maid-easy-project.onrender.com/notifications/clear?email=${email}`, { method: 'DELETE' });
         fetchNotifications(true);
     }
 
@@ -290,16 +290,16 @@
     setInterval(() => fetchNotifications(false), 30000);
 
     async function fetchMaids() {
-        const response = await fetch('http://localhost:5000/maids');
+        const response = await fetch('https://maid-easy-project.onrender.com/maids');
         const maids = await response.json();
         renderMaids(maids);
     }
 
     async function loadFilterOptions() {
         try {
-            const locRes = await fetch('http://localhost:5000/locations');
+            const locRes = await fetch('https://maid-easy-project.onrender.com/locations');
             const locations = await locRes.json();
-            const catRes = await fetch('http://localhost:5000/categories');
+            const catRes = await fetch('https://maid-easy-project.onrender.com/categories');
             const categories = await catRes.json();
             const locSelect = document.getElementById('filterLocation');
             const catSelect = document.getElementById('filterCategory');
@@ -311,7 +311,7 @@
     async function applyFilter() {
         const location = document.getElementById('filterLocation').value;
         const category = document.getElementById('filterCategory').value;
-        const response = await fetch(`http://localhost:5000/filter-maids?location=${location}&category=${category}`);
+        const response = await fetch(`https://maid-easy-project.onrender.com/filter-maids?location=${location}&category=${category}`);
         const maids = await response.json();
         renderMaids(maids);
     }
@@ -408,7 +408,7 @@
             if (!duration || duration < 1) return alert("Please enter valid hours!");
         }
 
-        const response = await fetch('http://localhost:5000/book', {
+        const response = await fetch('https://maid-easy-project.onrender.com/book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ maidName: selectedMaid, maidId: selectedMaidId, date, time, duration, userEmail, startDate: date, endDate, durationType, maidType: selectedMaidType })
@@ -436,7 +436,7 @@
     function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
 
     async function submitReview() {
-        const response = await fetch('http://localhost:5000/add-review', {
+        const response = await fetch('https://maid-easy-project.onrender.com/add-review', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ maidId: currentReviewMaidId, userEmail: localStorage.getItem('userEmail'), rating: document.getElementById('ratingValue').value, comment: document.getElementById('reviewComment').value })
