@@ -146,7 +146,6 @@
             font-weight: 600;
         }
 
-        /* NEW: Forgot password link */
         .forgot-link {
             display: block;
             margin-top: 12px;
@@ -163,6 +162,13 @@
             font-size: 13px;
             color: #999;
             text-decoration: none;
+        }
+
+        .loading-msg {
+            display: none;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--primary);
         }
 
         @media (max-width: 700px) {
@@ -196,14 +202,14 @@
                     <label>Password</label>
                     <input type="password" id="password" required>
                 </div>
-                <button type="submit" class="login-btn">Login</button>
+                <button type="submit" class="login-btn" id="loginBtn">Login</button>
+                <p class="loading-msg" id="loadingMsg">⏳ Server starting up, please wait...</p>
             </form>
 
             <div class="footer-links">
                 Don't have an account? <a href="register.html">Create Account</a>
             </div>
 
-            <!-- NEW: Forgot Password link -->
             <a href="forgot-password.html" class="forgot-link">
                 🔑 Forgot Password?
             </a>
@@ -219,16 +225,27 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const loadingMsg = document.getElementById('loadingMsg');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Logging in...';
+            loadingMsg.style.display = 'block';
 
             try {
-                const response = await fetch('http://localhost:5000/login', {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 60000);
+
+                const response = await fetch('https://maid-easy-project.onrender.com/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ email, password }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeout);
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     alert("Login Successful!");
                     localStorage.setItem('isLoggedIn', 'true');
@@ -246,9 +263,19 @@
                     }
                 } else {
                     alert(data.message || "Login Failed");
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Login';
+                    loadingMsg.style.display = 'none';
                 }
             } catch (err) {
-                alert("Server error, check if node server is running!");
+                if (err.name === 'AbortError') {
+                    alert("Server is starting up, please wait 30 seconds and try again!");
+                } else {
+                    alert("Connection failed, please try again!");
+                }
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Login';
+                loadingMsg.style.display = 'none';
             }
         });
     </script>
