@@ -11,7 +11,10 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://sprightly-tiramisu-cf15e6.netlify.app', 'http://localhost:5500', 'http://127.0.0.1:5500'],
+    credentials: true
+}));
 app.use(bodyParser.json({ limit: '50mb' })); 
 app.use(express.static(path.join(__dirname, 'frontend')));
 
