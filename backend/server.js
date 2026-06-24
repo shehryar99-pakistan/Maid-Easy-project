@@ -306,12 +306,35 @@ app.get('/filter-maids', async (req, res) => {
      }
 });
 
+// ✅ UPDATED: /add-review — sirf booked users hi review de sakte hain
 app.post('/add-review', async (req, res) => {
     try {
         const { maidId, userEmail, rating, comment } = req.body;
+
+        // Pehle maid dhundho name ke liye
+        const maid = await Maid.findById(maidId);
+        if (!maid) {
+            return res.status(404).json({ message: "Maid not found." });
+        }
+
+        // Check: kya is user ki koi Approved ya Completed booking hai is maid ke liye?
+        const validBooking = await Booking.findOne({
+            userEmail: userEmail,
+            maidName: maid.name,
+            status: { $in: ['Approved', 'Completed'] }
+        });
+
+        if (!validBooking) {
+            return res.status(403).json({ 
+                message: "⚠️ You can only review a maid you have an approved or completed booking with." 
+            });
+        }
+
         await new Review({ maidId, userEmail, rating, comment }).save();
         res.status(200).json({ message: "Review added successfully!" });
-    } catch (err) { res.status(500).json({ error: "Failed to add review" }); }
+    } catch (err) { 
+        res.status(500).json({ error: "Failed to add review" }); 
+    }
 });
 
 app.post('/book', async (req, res) => {
