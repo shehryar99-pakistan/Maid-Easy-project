@@ -61,10 +61,11 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
+// ✅ CHANGE 1: price → salary, age aur experience add kiye
 const MaidSchema = new mongoose.Schema({ 
      name: String, 
      service: String, 
-     price: String, 
+     salary: { type: String, default: '' },
      image: String,
      location: String,
      serviceCategory: String,
@@ -74,7 +75,9 @@ const MaidSchema = new mongoose.Schema({
      rejectionReason: { type: String, default: '' },
      submittedAt: { type: Date, default: null },
      cnicFront: { type: String, default: '' },
-     cnicBack:  { type: String, default: '' }
+     cnicBack:  { type: String, default: '' },
+     age: { type: String, default: '' },
+     experience: { type: String, default: '' }
 });
 const Maid = mongoose.model('Maid', MaidSchema, 'Maids');
 
@@ -306,30 +309,23 @@ app.get('/filter-maids', async (req, res) => {
      }
 });
 
-// ✅ UPDATED: /add-review — sirf booked users hi review de sakte hain
 app.post('/add-review', async (req, res) => {
     try {
         const { maidId, userEmail, rating, comment } = req.body;
-
-        // Pehle maid dhundho name ke liye
         const maid = await Maid.findById(maidId);
         if (!maid) {
             return res.status(404).json({ message: "Maid not found." });
         }
-
-        // Check: kya is user ki koi Approved ya Completed booking hai is maid ke liye?
         const validBooking = await Booking.findOne({
             userEmail: userEmail,
             maidName: maid.name,
             status: { $in: ['Approved', 'Completed'] }
         });
-
         if (!validBooking) {
             return res.status(403).json({ 
                 message: "⚠️ You can only review a maid you have an approved or completed booking with." 
             });
         }
-
         await new Review({ maidId, userEmail, rating, comment }).save();
         res.status(200).json({ message: "Review added successfully!" });
     } catch (err) { 
@@ -529,11 +525,12 @@ app.post('/admin/cancel-booking', async (req, res) => {
     }
 });
 
+// ✅ CHANGE 2: salary, age, experience add kiye
 app.post('/admin/add-maid', async (req, res) => {
      try {
-         const { name, service, price, location, serviceCategory, image, maidType } = req.body;
+         const { name, service, salary, age, experience, location, serviceCategory, image, maidType } = req.body;
          await new Maid({ 
-             name, service, price, location, serviceCategory, image, 
+             name, service, salary, age, experience, location, serviceCategory, image, 
              maidType: maidType || 'part-time',
              verificationStatus: 'Active'
          }).save();
@@ -541,10 +538,11 @@ app.post('/admin/add-maid', async (req, res) => {
      } catch (err) { res.status(500).json({ error: "Failed to add maid" }); }
 });
 
+// ✅ CHANGE 3: salary, age, experience add kiye
 app.post('/admin/update-maid', async (req, res) => {
     try {
-        const { id, name, service, price, location, serviceCategory, image, maidType } = req.body;
-        await Maid.findByIdAndUpdate(id, { name, service, price, location, serviceCategory, image, maidType: maidType || 'part-time' });
+        const { id, name, service, salary, age, experience, location, serviceCategory, image, maidType } = req.body;
+        await Maid.findByIdAndUpdate(id, { name, service, salary, age, experience, location, serviceCategory, image, maidType: maidType || 'part-time' });
         res.status(200).json({ message: "Maid updated successfully!" });
     } catch (err) { res.status(500).json({ error: "Update failed" }); }
 });
@@ -575,14 +573,15 @@ app.post('/agent/upload-cnic', upload.fields([
     }
 });
 
+// ✅ CHANGE 4: salary, age, experience add kiye
 app.post('/agent/submit-maid', async (req, res) => {
     try {
-        const { name, service, price, location, serviceCategory, image, maidType, agentEmail, cnicFront, cnicBack } = req.body;
+        const { name, service, salary, age, experience, location, serviceCategory, image, maidType, agentEmail, cnicFront, cnicBack } = req.body;
         if (!name || !location || !serviceCategory) {
             return res.status(400).json({ message: "Name, Location and Category are required." });
         }
         await new Maid({
-            name, service, price, location, serviceCategory, image,
+            name, service, salary, age, experience, location, serviceCategory, image,
             maidType: maidType || 'part-time',
             submittedBy: agentEmail,
             verificationStatus: 'Pending',
