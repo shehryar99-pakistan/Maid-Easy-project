@@ -61,7 +61,6 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
-// ✅ CHANGE 1: price → salary, age aur experience add kiye
 const MaidSchema = new mongoose.Schema({ 
      name: String, 
      service: String, 
@@ -90,7 +89,8 @@ const BookingSchema = new mongoose.Schema({
      status: { type: String, default: 'Pending' },
      startDate: { type: Date },
      endDate: { type: Date },
-     durationType: { type: String, enum: ['15days', '1month', '2months', 'custom'], default: 'custom' },
+     // ✅ UPDATED: naye duration types add kiye
+     durationType: { type: String, enum: ['15days', '1month', '2months', '3months', '6months', '1year', 'customMonths', 'customDays', 'custom'], default: 'custom' },
      cancelReason: { type: String },
      maidType: { type: String, default: 'part-time' },
      paymentStatus: { type: String, enum: ['Unpaid', 'Paid'], default: 'Unpaid' },
@@ -525,7 +525,6 @@ app.post('/admin/cancel-booking', async (req, res) => {
     }
 });
 
-// ✅ CHANGE 2: salary, age, experience add kiye
 app.post('/admin/add-maid', async (req, res) => {
      try {
          const { name, service, salary, age, experience, location, serviceCategory, image, maidType } = req.body;
@@ -538,7 +537,6 @@ app.post('/admin/add-maid', async (req, res) => {
      } catch (err) { res.status(500).json({ error: "Failed to add maid" }); }
 });
 
-// ✅ CHANGE 3: salary, age, experience add kiye
 app.post('/admin/update-maid', async (req, res) => {
     try {
         const { id, name, service, salary, age, experience, location, serviceCategory, image, maidType } = req.body;
@@ -573,7 +571,6 @@ app.post('/agent/upload-cnic', upload.fields([
     }
 });
 
-// ✅ CHANGE 4: salary, age, experience add kiye
 app.post('/agent/submit-maid', async (req, res) => {
     try {
         const { name, service, salary, age, experience, location, serviceCategory, image, maidType, agentEmail, cnicFront, cnicBack } = req.body;
