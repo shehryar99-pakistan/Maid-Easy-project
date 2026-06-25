@@ -24,6 +24,37 @@
         .section-divider { background: #f0f5ff; border-left: 3px solid var(--primary); padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--primary); text-align: left; margin-bottom: 12px; }
         .signup-btn { width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 5px; font-family: 'Poppins', sans-serif; transition: 0.3s; }
         .signup-btn:hover { background: #004dc7; }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; min-height: 100vh; }
+
+            .left-panel { width: 100%; height: 200px; flex: none; }
+            .left-panel img { height: 200px; }
+
+            .right-panel { width: 100%; min-width: unset; padding: 20px 16px; }
+
+            .signup-card { padding: 24px 18px; border-radius: 16px; }
+
+            .logo-text { font-size: 20px; }
+
+            .input-group input, .input-group select { font-size: 13px; padding: 9px; }
+
+            .signup-btn { font-size: 15px; padding: 11px; }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel { height: 150px; }
+            .left-panel img { height: 150px; }
+
+            .right-panel { padding: 16px 12px; }
+
+            .signup-card { padding: 20px 14px; }
+
+            .logo-text { font-size: 18px; }
+
+            .signup-btn { font-size: 14px; }
+        }
     </style>
 </head>
 <body>

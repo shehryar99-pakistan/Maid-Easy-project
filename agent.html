@@ -101,6 +101,79 @@
         .toast.error { background: #e74c3c; box-shadow: 0 8px 24px rgba(231,76,60,0.4); }
 
         .rejection-box { background: #ffe8e8; border-left: 3px solid #e74c3c; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #c0392b; margin-top: 6px; }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 14px 16px;
+                gap: 10px;
+            }
+
+            .sidebar-logo { font-size: 18px; margin-bottom: 0; }
+            .sidebar-role { display: none; }
+
+            .sidebar-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 6px;
+                width: 100%;
+            }
+
+            .menu-item {
+                flex: 1;
+                min-width: 120px;
+                padding: 8px 10px;
+                font-size: 12px;
+                justify-content: center;
+            }
+
+            .menu-item.logout-item { margin-top: 0; }
+
+            .main {
+                margin-left: 0;
+                padding: 16px 12px;
+            }
+
+            .welcome-banner {
+                padding: 20px 18px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .welcome-banner h2 { font-size: 18px; }
+            .welcome-banner .icon-wrap { display: none; }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+            .stat-info h3 { font-size: 18px; }
+
+            .form-grid { grid-template-columns: 1fr; padding: 16px; gap: 12px; }
+            .form-group.full { grid-column: 1; }
+            .cnic-section { grid-column: 1; }
+            .cnic-grid { grid-template-columns: 1fr; gap: 12px; }
+
+            .submit-btn { margin: 0 16px 16px 16px; width: calc(100% - 32px); }
+
+            /* Table scroll */
+            .card { overflow-x: auto; }
+            table { min-width: 550px; }
+
+            .toast { bottom: 16px; right: 16px; left: 16px; font-size: 13px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-card { padding: 12px 14px; gap: 10px; }
+            .stat-icon { width: 36px; height: 36px; font-size: 15px; }
+            .stat-info h3 { font-size: 16px; }
+            .menu-item { font-size: 11px; padding: 7px 8px; }
+            .welcome-banner { padding: 16px 14px; }
+            .welcome-banner h2 { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
@@ -156,7 +229,6 @@
                     <label>Service</label>
                     <input type="text" id="sService" placeholder="e.g. House Cleaning">
                 </div>
-                <!-- ✅ price → salary -->
                 <div class="form-group">
                     <label>Salary</label>
                     <input type="text" id="sSalary" placeholder="e.g. 15000 PKR/month">
@@ -173,12 +245,10 @@
                     <label>Profile Image URL</label>
                     <input type="text" id="sImage" placeholder="Paste maid photo URL">
                 </div>
-                <!-- ✅ Age add kiya -->
                 <div class="form-group">
                     <label>Age</label>
                     <input type="text" id="sAge" placeholder="e.g. 35">
                 </div>
-                <!-- ✅ Experience add kiya -->
                 <div class="form-group">
                     <label>Experience</label>
                     <input type="text" id="sExperience" placeholder="e.g. 3 Years">
@@ -359,7 +429,6 @@
         } catch (err) { console.error(err); }
     }
 
-    // ✅ salary, age, experience add kiye
     async function submitMaid() {
         const name       = document.getElementById('sName').value.trim();
         const service    = document.getElementById('sService').value.trim();

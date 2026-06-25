@@ -480,6 +480,74 @@
         .empty-pending { text-align: center; padding: 40px 20px; color: #bbb; }
         .empty-pending i { font-size: 40px; color: #d0d8ff; display: block; margin-bottom: 12px; }
         .empty-pending p { font-size: 14px; }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 14px 16px;
+                gap: 8px;
+            }
+
+            .sidebar-logo { font-size: 18px; margin-bottom: 0; }
+            .sidebar-role { display: none; }
+
+            .sidebar-menu {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 6px;
+                width: 100%;
+            }
+
+            .menu-item {
+                flex: 1;
+                min-width: 100px;
+                padding: 8px 10px;
+                font-size: 11px;
+                justify-content: center;
+            }
+
+            .menu-item.logout-item { margin-top: 0; }
+
+            .main {
+                margin-left: 0;
+                padding: 16px 12px;
+            }
+
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+            .stat-info h3 { font-size: 18px; }
+            .stat-card { padding: 14px; gap: 10px; }
+
+            .form-grid { grid-template-columns: 1fr; padding: 16px; gap: 12px; }
+            .form-group.full { grid-column: 1; }
+
+            .add-maid-btn { margin: 0 16px 16px 16px; width: calc(100% - 32px); }
+
+            /* Tables scroll */
+            .card { overflow-x: auto; }
+            table { min-width: 600px; }
+
+            .maid-grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+
+            .modal-box { width: 92vw; }
+            .modal-body { padding: 16px; }
+
+            .section-header h2 { font-size: 17px; }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .stat-card { padding: 12px; }
+            .stat-icon { width: 36px; height: 36px; font-size: 15px; }
+            .stat-info h3 { font-size: 16px; }
+            .menu-item { font-size: 10px; padding: 7px 6px; min-width: 80px; }
+            .maid-grid { grid-template-columns: 1fr; }
+            .modal-box { width: 95vw; }
+        }
     </style>
 </head>
 <body>
@@ -567,7 +635,6 @@
             </div>
         </div>
 
-        <!-- ✅ Add Maid form — salary, age, experience add kiye -->
         <div class="section" id="section-addmaid">
             <div class="section-header"><h2>Add New Maid</h2></div>
             <div class="card">
@@ -648,7 +715,6 @@
 
     </div>
 
-    <!-- ✅ Edit Modal — salary, age, experience add kiye -->
     <div id="editModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -871,7 +937,6 @@
             }).join('');
         }
 
-        // ✅ salary, age, experience add kiye
         async function addMaid() {
             const maidData = {
                 name:            document.getElementById('mName').value,
@@ -900,7 +965,6 @@
             }
         }
 
-        // ✅ salary, age, experience add kiye
         function openEditModal(index) {
             const m = maidsData[index];
             document.getElementById('editMaidId').value    = m._id;
@@ -918,7 +982,6 @@
 
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
-        // ✅ salary, age, experience add kiye
         async function saveMaidEdit() {
             const id = document.getElementById('editMaidId').value;
             const updatedData = {

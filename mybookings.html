@@ -68,6 +68,48 @@
         input, select { width: 100%; padding: 10px; margin: 4px 0; border: 1.5px solid #e0e7ff; border-radius: 10px; box-sizing: border-box; font-family: 'Poppins', sans-serif; font-size: 14px; }
         input:focus { border-color: var(--primary); outline: none; }
         @media (max-width: 700px) { .stats-row { grid-template-columns: 1fr; } .page-header { flex-direction: column; gap: 10px; align-items: flex-start; } td, th { padding: 12px 12px; } }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 768px) {
+            body { padding: 15px 10px; }
+
+            nav { padding: 10px 16px; margin-bottom: 20px; }
+            .logo-text { font-size: 18px; }
+            .back-btn { padding: 7px 14px; font-size: 13px; }
+
+            .page-header { margin-bottom: 15px; }
+            .page-header h1 { font-size: 20px; }
+
+            .stats-row { gap: 10px; margin-bottom: 15px; }
+            .stat-card { padding: 14px 16px; gap: 10px; }
+            .stat-info h3 { font-size: 18px; }
+
+            .container { border-radius: 14px; }
+            .container-header { padding: 14px 16px; }
+
+            /* Table scroll on mobile */
+            .container { overflow-x: auto; }
+            table { min-width: 600px; }
+
+            th { padding: 12px 14px; font-size: 11px; }
+            td { padding: 12px 14px; font-size: 13px; }
+
+            .modal-content {
+                width: 92vw;
+                padding: 22px 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav { padding: 8px 12px; }
+            .logo-text { font-size: 16px; }
+            .back-btn { font-size: 12px; padding: 6px 12px; }
+            .page-header h1 { font-size: 18px; }
+            .stat-card { padding: 12px 14px; }
+            .stat-icon { width: 36px; height: 36px; font-size: 15px; }
+            .stat-info h3 { font-size: 16px; }
+            .modal-content { width: 95vw; padding: 18px 14px; }
+        }
     </style>
 </head>
 <body>
@@ -246,7 +288,6 @@
                 const endD   = b.endDate   ? new Date(b.endDate).toLocaleDateString()   : 'N/A';
                 const isFullTime = b.maidType === 'full-time';
 
-                // Payment column
                 let paymentCell = '';
                 if (b.status === 'Approved') {
                     if (b.paymentStatus === 'Paid') {

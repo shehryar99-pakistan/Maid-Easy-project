@@ -130,6 +130,46 @@
         .conflict-error { background: #ffe8e8; color: #e74c3c; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-top: 10px; display: none; text-align: left; }
         .fulltime-modal-badge { background: #1a1a1a; color: #ffb400; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 10px; }
         .custom-days-wrapper { display: none; margin-top: 6px; }
+
+        /* ── MOBILE RESPONSIVE ── */
+        @media (max-width: 768px) {
+            body { padding: 12px 10px; }
+
+            nav { padding: 10px 14px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+            nav h2 { font-size: 20px; }
+
+            .nav-links { gap: 6px; flex-wrap: wrap; }
+            .profile-btn { padding: 8px 12px; font-size: 12px; margin-right: 0; }
+            .nav-btn { padding: 8px 12px; font-size: 12px; }
+            .logout-btn { padding: 8px 12px; font-size: 12px; }
+
+            h1 { font-size: 22px; margin-bottom: 20px; }
+
+            .filter-section { padding: 20px 16px; margin-bottom: 25px; }
+            .filter-row { flex-direction: column; gap: 12px; }
+            .filter-group { min-width: unset; width: 100%; }
+            .search-btn { width: 100%; justify-content: center; }
+            .clear-btn { width: 100%; justify-content: center; }
+
+            .maid-grid { grid-template-columns: 1fr; gap: 18px; }
+
+            .notif-dropdown { width: 280px; right: -60px; }
+
+            .modal-content { width: 92vw; padding: 22px 16px; }
+            .detail-modal-content { width: 92vw; }
+            .detail-modal-body { padding: 18px 16px; }
+            .detail-info-grid { grid-template-columns: 1fr; gap: 8px; }
+        }
+
+        @media (max-width: 480px) {
+            nav h2 { font-size: 18px; }
+            .profile-btn, .nav-btn, .logout-btn { padding: 7px 10px; font-size: 11px; }
+            .bell-btn { width: 36px; height: 36px; font-size: 15px; }
+            h1 { font-size: 20px; }
+            .filter-section { padding: 16px 12px; }
+            .modal-content { width: 95vw; padding: 18px 12px; }
+            .notif-dropdown { width: 260px; right: -80px; }
+        }
     </style>
 </head>
 <body>
@@ -228,7 +268,6 @@
         <label class="modal-label">📅 Start Date</label>
         <input type="date" id="bookingDate" onchange="onStartDateChange()">
         <label class="modal-label">⏱️ Duration Type</label>
-        <!-- ✅ UPDATED: Months options add kiye -->
         <select id="durationType" onchange="onDurationTypeChange()">
             <option value="15days">15 Days</option>
             <option value="1month">1 Month</option>
@@ -239,7 +278,6 @@
             <option value="customMonths">Custom (Enter Months)</option>
             <option value="customDays">Custom (Enter Days)</option>
         </select>
-        <!-- ✅ Custom input wrapper -->
         <div class="custom-days-wrapper" id="customDaysWrapper">
             <input type="number" id="customDays" min="1" placeholder="Enter number" onchange="calculateEndDate()">
         </div>
@@ -553,7 +591,6 @@
         calculateEndDate();
     }
 
-    // ✅ UPDATED: End date change par months auto detect karo
     function onEndDateChange() {
         const startDate = document.getElementById('bookingDate').value;
         const endDate = document.getElementById('bookingEndDate').value;
@@ -567,7 +604,6 @@
         const customWrapper = document.getElementById('customDaysWrapper');
         const customInput = document.getElementById('customDays');
 
-        // Months calculate karo
         const diffMonths = Math.round(diffDays / 30);
 
         if (diffDays === 15) {
@@ -589,7 +625,6 @@
             durationType.value = '1year';
             customWrapper.style.display = 'none';
         } else {
-            // Custom months show karo
             durationType.value = 'customMonths';
             customWrapper.style.display = 'block';
             customInput.placeholder = 'Enter number of months e.g. 5';
@@ -597,7 +632,6 @@
         }
     }
 
-    // ✅ UPDATED: Months aur days dono handle karo
     function calculateEndDate() {
         const startDate = document.getElementById('bookingDate').value;
         const durationType = document.getElementById('durationType').value;
