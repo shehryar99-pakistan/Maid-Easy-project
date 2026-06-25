@@ -13,13 +13,13 @@
         .header { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 15px 5%; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            position: sticky; top: 0; z-index: 1000; flex-wrap: wrap; gap: 8px;
+            position: sticky; top: 0; z-index: 1000;
         }
-        .logo-container { display: flex; align-items: center; gap: 12px; margin: 0 auto; transform: translateX(50px); }
+        .logo-container { display: flex; align-items: center; gap: 12px; }
         .logo-icon { width: 45px; height: 45px; background: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px; box-shadow: 0 4px 12px rgba(0,98,255,0.3); }
         .logo-text { font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: -1px; }
         .logo-text span { color: var(--gold); }
-        .login-btn { background: var(--primary); color: white; padding: 10px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; }
+        .login-btn { background: var(--primary); color: white; padding: 10px 30px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; white-space: nowrap; }
         .login-btn:hover { background: #004dc7; transform: translateY(-2px); }
 
         .hero { display: flex; flex-direction: column; align-items: center; padding: 40px 8%; background: var(--light); text-align: center; }
@@ -61,17 +61,11 @@
 
         /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 768px) {
-            .header { padding: 12px 5%; }
+            .header { padding: 12px 4%; }
 
-            .logo-container {
-                transform: translateX(0);
-                margin: 0;
-                flex: 1;
-            }
-
-            .logo-text { font-size: 22px; }
-            .logo-icon { width: 38px; height: 38px; font-size: 20px; }
-            .login-btn { padding: 8px 18px; font-size: 13px; }
+            .logo-icon { width: 36px; height: 36px; font-size: 18px; border-radius: 9px; }
+            .logo-text { font-size: 20px; }
+            .login-btn { padding: 8px 16px; font-size: 13px; }
 
             .hero { padding: 30px 5%; }
             .hero h1 { font-size: 26px; margin-bottom: 20px; }
@@ -93,9 +87,11 @@
         }
 
         @media (max-width: 480px) {
-            .hero h1 { font-size: 22px; }
-            .logo-text { font-size: 20px; }
+            .header { padding: 10px 4%; }
+            .logo-icon { width: 32px; height: 32px; font-size: 16px; }
+            .logo-text { font-size: 18px; }
             .login-btn { padding: 7px 14px; font-size: 12px; }
+            .hero h1 { font-size: 22px; }
         }
     </style>
 </head>
