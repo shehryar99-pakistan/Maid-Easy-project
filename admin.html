@@ -483,18 +483,19 @@
 
         /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 768px) {
+            body { flex-direction: column; }
+
             .sidebar {
                 width: 100%;
                 height: auto;
                 position: relative;
-                flex-direction: row;
-                flex-wrap: wrap;
+                flex-direction: column;
                 padding: 14px 16px;
                 gap: 8px;
             }
 
-            .sidebar-logo { font-size: 18px; margin-bottom: 0; }
-            .sidebar-role { display: none; }
+            .sidebar-logo { font-size: 18px; margin-bottom: 4px; }
+            .sidebar-role { margin-bottom: 10px; padding-bottom: 10px; }
 
             .sidebar-menu {
                 flex-direction: row;
@@ -505,17 +506,20 @@
 
             .menu-item {
                 flex: 1;
-                min-width: 100px;
+                min-width: 120px;
                 padding: 8px 10px;
                 font-size: 11px;
                 justify-content: center;
+                text-align: center;
             }
 
+            .menu-item i { width: auto; }
             .menu-item.logout-item { margin-top: 0; }
 
             .main {
                 margin-left: 0;
                 padding: 16px 12px;
+                width: 100%;
             }
 
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
@@ -527,7 +531,6 @@
 
             .add-maid-btn { margin: 0 16px 16px 16px; width: calc(100% - 32px); }
 
-            /* Tables scroll */
             .card { overflow-x: auto; }
             table { min-width: 600px; }
 
