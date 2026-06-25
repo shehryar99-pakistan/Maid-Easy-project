@@ -567,6 +567,7 @@
             </div>
         </div>
 
+        <!-- ✅ Add Maid form — salary, age, experience add kiye -->
         <div class="section" id="section-addmaid">
             <div class="section-header"><h2>Add New Maid</h2></div>
             <div class="card">
@@ -584,8 +585,8 @@
                         <input type="text" id="mService" placeholder="e.g. Cleaning">
                     </div>
                     <div class="form-group">
-                        <label>Price</label>
-                        <input type="text" id="mPrice" placeholder="e.g. 500 PKR/hr">
+                        <label>Salary</label>
+                        <input type="text" id="mSalary" placeholder="e.g. 15000 PKR/month">
                     </div>
                     <div class="form-group">
                         <label>Location</label>
@@ -598,6 +599,14 @@
                     <div class="form-group">
                         <label>Image URL</label>
                         <input type="text" id="mImage" placeholder="Paste image URL">
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="text" id="mAge" placeholder="e.g. 35">
+                    </div>
+                    <div class="form-group">
+                        <label>Experience</label>
+                        <input type="text" id="mExperience" placeholder="e.g. 3 Years">
                     </div>
                     <div class="form-group">
                         <label>Maid Type</label>
@@ -639,6 +648,7 @@
 
     </div>
 
+    <!-- ✅ Edit Modal — salary, age, experience add kiye -->
     <div id="editModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -656,8 +666,8 @@
                     <input type="text" id="editService" placeholder="Service">
                 </div>
                 <div class="form-group">
-                    <label>Price</label>
-                    <input type="text" id="editPrice" placeholder="Price">
+                    <label>Salary</label>
+                    <input type="text" id="editSalary" placeholder="e.g. 15000 PKR/month">
                 </div>
                 <div class="form-group">
                     <label>Location</label>
@@ -670,6 +680,14 @@
                 <div class="form-group">
                     <label>Image URL</label>
                     <input type="text" id="editImage" placeholder="Image URL">
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="text" id="editAge" placeholder="e.g. 35">
+                </div>
+                <div class="form-group">
+                    <label>Experience</label>
+                    <input type="text" id="editExperience" placeholder="e.g. 3 Years">
                 </div>
                 <div class="form-group">
                     <label>Maid Type</label>
@@ -837,7 +855,9 @@
                         <h4>${m.name}</h4>
                         <p><i class="fas fa-broom"></i> ${m.service || 'N/A'}</p>
                         <p><i class="fas fa-map-marker-alt"></i> ${m.location || 'N/A'}</p>
-                        <p><i class="fas fa-tag"></i> ${m.price || 'N/A'}</p>
+                        <p><i class="fas fa-money-bill-wave"></i> ${m.salary || 'N/A'}</p>
+                        <p><i class="fas fa-calendar-alt"></i> Age: ${m.age || 'N/A'}</p>
+                        <p><i class="fas fa-briefcase"></i> Exp: ${m.experience || 'N/A'}</p>
                         <div class="maid-card-actions">
                             <button class="edit-btn" onclick="openEditModal(${index})">
                                 <i class="fas fa-edit"></i> Edit
@@ -851,15 +871,18 @@
             }).join('');
         }
 
+        // ✅ salary, age, experience add kiye
         async function addMaid() {
             const maidData = {
-                name: document.getElementById('mName').value,
-                service: document.getElementById('mService').value,
-                price: document.getElementById('mPrice').value,
-                location: document.getElementById('mLocation').value,
+                name:            document.getElementById('mName').value,
+                service:         document.getElementById('mService').value,
+                salary:          document.getElementById('mSalary').value,
+                location:        document.getElementById('mLocation').value,
                 serviceCategory: document.getElementById('mCategory').value,
-                image: document.getElementById('mImage').value,
-                maidType: document.getElementById('mMaidType').value
+                image:           document.getElementById('mImage').value,
+                age:             document.getElementById('mAge').value,
+                experience:      document.getElementById('mExperience').value,
+                maidType:        document.getElementById('mMaidType').value
             };
 
             const res = await fetch('https://maid-easy-project.onrender.com/admin/add-maid', {
@@ -870,44 +893,45 @@
 
             if (res.ok) {
                 alert("Maid added successfully!");
-                document.getElementById('mName').value     = '';
-                document.getElementById('mService').value  = '';
-                document.getElementById('mPrice').value    = '';
-                document.getElementById('mLocation').value = '';
-                document.getElementById('mCategory').value = '';
-                document.getElementById('mImage').value    = '';
+                ['mName','mService','mSalary','mLocation','mCategory','mImage','mAge','mExperience'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('mMaidType').value = 'part-time';
             } else {
                 alert("Error adding maid");
             }
         }
 
+        // ✅ salary, age, experience add kiye
         function openEditModal(index) {
             const m = maidsData[index];
-            document.getElementById('editMaidId').value   = m._id;
-            document.getElementById('editName').value     = m.name || '';
-            document.getElementById('editService').value  = m.service || '';
-            document.getElementById('editPrice').value    = m.price || '';
-            document.getElementById('editLocation').value = m.location || '';
-            document.getElementById('editCategory').value = m.serviceCategory || '';
-            document.getElementById('editImage').value    = m.image || '';
-            document.getElementById('editMaidType').value = m.maidType || 'part-time';
+            document.getElementById('editMaidId').value    = m._id;
+            document.getElementById('editName').value      = m.name || '';
+            document.getElementById('editService').value   = m.service || '';
+            document.getElementById('editSalary').value    = m.salary || '';
+            document.getElementById('editLocation').value  = m.location || '';
+            document.getElementById('editCategory').value  = m.serviceCategory || '';
+            document.getElementById('editImage').value     = m.image || '';
+            document.getElementById('editAge').value       = m.age || '';
+            document.getElementById('editExperience').value = m.experience || '';
+            document.getElementById('editMaidType').value  = m.maidType || 'part-time';
             document.getElementById('editModal').classList.add('active');
         }
 
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
+        // ✅ salary, age, experience add kiye
         async function saveMaidEdit() {
             const id = document.getElementById('editMaidId').value;
             const updatedData = {
                 id,
-                name: document.getElementById('editName').value,
-                service: document.getElementById('editService').value,
-                price: document.getElementById('editPrice').value,
-                location: document.getElementById('editLocation').value,
+                name:            document.getElementById('editName').value,
+                service:         document.getElementById('editService').value,
+                salary:          document.getElementById('editSalary').value,
+                location:        document.getElementById('editLocation').value,
                 serviceCategory: document.getElementById('editCategory').value,
-                image: document.getElementById('editImage').value,
-                maidType: document.getElementById('editMaidType').value
+                image:           document.getElementById('editImage').value,
+                age:             document.getElementById('editAge').value,
+                experience:      document.getElementById('editExperience').value,
+                maidType:        document.getElementById('editMaidType').value
             };
 
             const res = await fetch('https://maid-easy-project.onrender.com/admin/update-maid', {

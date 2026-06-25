@@ -156,9 +156,10 @@
                     <label>Service</label>
                     <input type="text" id="sService" placeholder="e.g. House Cleaning">
                 </div>
+                <!-- ✅ price → salary -->
                 <div class="form-group">
-                    <label>Price</label>
-                    <input type="text" id="sPrice" placeholder="e.g. 500 PKR/hr">
+                    <label>Salary</label>
+                    <input type="text" id="sSalary" placeholder="e.g. 15000 PKR/month">
                 </div>
                 <div class="form-group">
                     <label>Location</label>
@@ -171,6 +172,16 @@
                 <div class="form-group">
                     <label>Profile Image URL</label>
                     <input type="text" id="sImage" placeholder="Paste maid photo URL">
+                </div>
+                <!-- ✅ Age add kiya -->
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="text" id="sAge" placeholder="e.g. 35">
+                </div>
+                <!-- ✅ Experience add kiya -->
+                <div class="form-group">
+                    <label>Experience</label>
+                    <input type="text" id="sExperience" placeholder="e.g. 3 Years">
                 </div>
                 <div class="form-group">
                     <label>Maid Type</label>
@@ -348,14 +359,17 @@
         } catch (err) { console.error(err); }
     }
 
+    // ✅ salary, age, experience add kiye
     async function submitMaid() {
-        const name     = document.getElementById('sName').value.trim();
-        const service  = document.getElementById('sService').value.trim();
-        const price    = document.getElementById('sPrice').value.trim();
-        const location = document.getElementById('sLocation').value.trim();
-        const category = document.getElementById('sCategory').value.trim();
-        const image    = document.getElementById('sImage').value.trim();
-        const maidType = document.getElementById('sMaidType').value;
+        const name       = document.getElementById('sName').value.trim();
+        const service    = document.getElementById('sService').value.trim();
+        const salary     = document.getElementById('sSalary').value.trim();
+        const location   = document.getElementById('sLocation').value.trim();
+        const category   = document.getElementById('sCategory').value.trim();
+        const image      = document.getElementById('sImage').value.trim();
+        const age        = document.getElementById('sAge').value.trim();
+        const experience = document.getElementById('sExperience').value.trim();
+        const maidType   = document.getElementById('sMaidType').value;
 
         if (!name || !location || !category) {
             showToast('Please fill Name, Location and Category!', true);
@@ -373,7 +387,7 @@
             const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, service, price, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })
+                body: JSON.stringify({ name, service, salary, age, experience, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })
             });
 
             const result = await res.json();
@@ -382,7 +396,7 @@
 
             if (res.ok) {
                 showToast('Maid submitted successfully! Awaiting admin verification.');
-                ['sName','sService','sPrice','sLocation','sCategory','sImage'].forEach(id => document.getElementById(id).value = '');
+                ['sName','sService','sSalary','sLocation','sCategory','sImage','sAge','sExperience'].forEach(id => document.getElementById(id).value = '');
                 document.getElementById('sMaidType').value = 'part-time';
                 document.getElementById('cnicFrontFile').value = '';
                 document.getElementById('cnicBackFile').value  = '';
