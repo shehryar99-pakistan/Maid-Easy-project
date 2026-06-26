@@ -108,6 +108,8 @@
         .review-btn:hover { background: #f0f5ff; }
         .details-btn { background: #f8faff; border: 1.5px solid #e0e7ff; color: #555; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 14px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .details-btn:hover { background: #e8f0ff; border-color: var(--primary); color: var(--primary); }
+        .cancel-booking-btn { background: #fff3e0; color: #ff6b35; border: 1.5px solid #ff6b35; padding: 10px; border-radius: 10px; width: 100%; cursor: pointer; font-weight: 600; font-family: 'Poppins', sans-serif; font-size: 13px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .cancel-booking-btn:hover { background: #ff6b35; color: white; }
         #detailModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .detail-modal-content { background: white; border-radius: 24px; width: 420px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.2); overflow: hidden; }
         .detail-modal-img { width: 100%; height: 200px; object-fit: cover; }
@@ -123,7 +125,6 @@
         .detail-info-item i { color: var(--primary); font-size: 16px; width: 20px; }
         .detail-info-item div p { font-size: 11px; color: #999; font-weight: 500; margin: 0; }
         .detail-info-item div h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin: 0; }
-        /* ✅ NEW: availability box */
         .avail-info-box { background: #e8f0ff; border-left: 3px solid var(--primary); border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px; font-size: 13px; color: var(--primary); font-weight: 600; }
         .avail-info-box i { font-size: 16px; }
         #bookingModal, #reviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
@@ -135,10 +136,8 @@
         .conflict-error { background: #ffe8e8; color: #e74c3c; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; margin-top: 10px; display: none; text-align: left; }
         .fulltime-modal-badge { background: #1a1a1a; color: #ffb400; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 10px; }
         .custom-days-wrapper { display: none; margin-top: 6px; }
-        /* ✅ NEW: availability hint in booking modal */
         .avail-hint { background: #e8f0ff; color: var(--primary); padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; text-align: left; margin-top: 8px; display: none; }
         .avail-hint.show { display: block; }
-
         @media (max-width: 768px) {
             body { padding: 12px 10px; }
             nav { grid-template-columns: 1fr; padding: 12px 14px; margin-bottom: 20px; gap: 10px; }
@@ -172,8 +171,7 @@
     </style>
 </head>
 <body>
-
-<nav>
+    <nav>
     <div></div>
     <div class="nav-logo">Maid<span>Easy</span></div>
     <div class="nav-links">
@@ -229,7 +227,6 @@
                 <button class="detail-modal-close" onclick="closeDetailModal()">&times;</button>
             </div>
             <div class="detail-verified"><i class="fas fa-shield-alt"></i> Verified Maid</div>
-            <!-- ✅ NEW: availability box -->
             <div class="avail-info-box" id="detailAvailBox" style="display:none;">
                 <i class="fas fa-clock"></i>
                 <span id="detailAvailText"></span>
@@ -271,7 +268,6 @@
         <label class="modal-label">📅 End Date</label>
         <input type="date" id="bookingEndDate" onchange="onEndDateChange()">
         <div id="partTimeFields">
-            <!-- ✅ NEW: availability hint -->
             <div class="avail-hint" id="availHint"></div>
             <label class="modal-label">⏰ Start Time</label>
             <input type="time" id="bookingTime">
@@ -300,7 +296,6 @@
         <button onclick="closeReviewModal()" style="width:100%;padding:10px;background:#666;color:white;border:none;border-radius:8px;margin-top:10px;cursor:pointer;">Cancel</button>
     </div>
 </div>
-
 <script>
     if (localStorage.getItem('isLoggedIn') !== 'true') window.location.href = "index.html";
     function logout() { localStorage.clear(); window.location.href = "index.html"; }
@@ -309,14 +304,12 @@
     let selectedMaidAvailFrom = "", selectedMaidAvailTo = "";
     let currentReviewMaidId = "", lastUnreadCount = 0;
 
-    // ✅ Next month ka 1st calculate karo
     function getMaxStartDate() {
         const today = new Date();
         const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
         return nextMonth.toISOString().split('T')[0];
     }
 
-    // ✅ "14:30" → "2:30 PM"
     function formatTime12hr(t) {
         if (!t) return '';
         const [h, m] = t.split(':').map(Number);
@@ -327,13 +320,13 @@
 
     function getNotifIcon(type) {
         const icons = {
-            'booking_approved': { cls: 'approved', icon: 'fa-check' },
-            'booking_rejected': { cls: 'rejected', icon: 'fa-times' },
+            'booking_approved':  { cls: 'approved',  icon: 'fa-check' },
+            'booking_rejected':  { cls: 'rejected',  icon: 'fa-times' },
             'booking_cancelled': { cls: 'cancelled', icon: 'fa-ban' },
-            'profile_updated': { cls: 'profile', icon: 'fa-user-edit' },
-            'password_changed': { cls: 'password', icon: 'fa-lock' },
-            'phone_updated': { cls: 'phone', icon: 'fa-phone' },
-            'photo_updated': { cls: 'photo', icon: 'fa-camera' },
+            'profile_updated':   { cls: 'profile',   icon: 'fa-user-edit' },
+            'password_changed':  { cls: 'password',  icon: 'fa-lock' },
+            'phone_updated':     { cls: 'phone',     icon: 'fa-phone' },
+            'photo_updated':     { cls: 'photo',     icon: 'fa-camera' },
         };
         return icons[type] || { cls: 'profile', icon: 'fa-bell' };
     }
@@ -455,6 +448,8 @@
 
     function renderMaids(maids) {
         const container = document.getElementById('maidContainer');
+        const userEmail = localStorage.getItem('userEmail');
+
         if (maids.length === 0) {
             container.innerHTML = `
                 <div class="no-results" style="grid-column: 1 / -1;">
@@ -465,16 +460,18 @@
                 </div>`;
             return;
         }
+
         container.innerHTML = maids.map(maid => {
             const isFullTime = maid.maidType === 'full-time';
-            const isBooked = isFullTime && maid.activeBooking;
+            const isBooked   = isFullTime && maid.activeBooking;
+
             let bookedBanner = '';
             if (isBooked) {
                 const from = new Date(maid.activeBooking.startDate).toLocaleDateString();
-                const to = new Date(maid.activeBooking.endDate).toLocaleDateString();
+                const to   = new Date(maid.activeBooking.endDate).toLocaleDateString();
                 bookedBanner = `<div class="booked-banner">🔴 Already Booked: ${from} → ${to}</div>`;
             }
-            // ✅ availableFrom + availableTo bhi pass karo
+
             const maidJson = encodeURIComponent(JSON.stringify({
                 name: maid.name, image: maid.image || '', salary: maid.salary || '',
                 age: maid.age || '', experience: maid.experience || '',
@@ -484,9 +481,19 @@
                 availableTo:   maid.availableTo   || ''
             }));
 
-            // ✅ Card pe availability dikhao
             const availMeta = (!isFullTime && maid.availableFrom && maid.availableTo)
                 ? `<div class="meta-item"><i class="fas fa-clock"></i><span>${formatTime12hr(maid.availableFrom)} – ${formatTime12hr(maid.availableTo)}</span></div>`
+                : '';
+
+            // ✅ User ki pending booking check
+            const userPendingBooking = maid.bookings
+                ? maid.bookings.find(bk => bk.userEmail === userEmail && bk.status === 'Pending')
+                : null;
+
+            const cancelBtn = userPendingBooking
+                ? `<button class="cancel-booking-btn" onclick="cancelMyBooking('${userPendingBooking._id}', '${maid.name}')">
+                       <i class="fas fa-times-circle"></i> Cancel My Booking
+                   </button>`
                 : '';
 
             return `
@@ -505,7 +512,9 @@
                     </div>
                     <div class="reviews-box">
                         <strong>💬 Reviews</strong>
-                        ${maid.reviews && maid.reviews.length > 0 ? maid.reviews.map(r => `<p><em>${r.userEmail.split('@')[0]}:</em> ${r.comment}</p>`).join('') : '<p>No reviews yet.</p>'}
+                        ${maid.reviews && maid.reviews.length > 0
+                            ? maid.reviews.map(r => `<p><em>${r.userEmail.split('@')[0]}:</em> ${r.comment}</p>`).join('')
+                            : '<p>No reviews yet.</p>'}
                     </div>
                     <div class="card-meta">
                         <div class="meta-item"><i class="fas fa-map-marker-alt"></i><span>${maid.location || 'N/A'}</span></div>
@@ -513,11 +522,16 @@
                         ${availMeta}
                     </div>
                     <div class="card-actions">
-                        <button class="details-btn" onclick="openDetailModal('${maidJson}')"><i class="fas fa-info-circle"></i> View Details</button>
+                        <button class="details-btn" onclick="openDetailModal('${maidJson}')">
+                            <i class="fas fa-info-circle"></i> View Details
+                        </button>
                         <button class="book-btn" ${isBooked ? 'disabled' : ''} onclick="bookMaid('${maid.name}', '${maid._id}', '${maid.maidType || 'part-time'}', '${maid.availableFrom || ''}', '${maid.availableTo || ''}')">
                             <i class="fas fa-calendar-check"></i> ${isBooked ? 'Currently Unavailable' : 'Book Now'}
                         </button>
-                        <button class="review-btn" onclick="openReviewModal('${maid.name}', '${maid._id}')"><i class="fas fa-star"></i> Give Review</button>
+                        <button class="review-btn" onclick="openReviewModal('${maid.name}', '${maid._id}')">
+                            <i class="fas fa-star"></i> Give Review
+                        </button>
+                        ${cancelBtn}
                     </div>
                 </div>
             </div>`;
@@ -537,8 +551,6 @@
         document.getElementById('detailLocation').innerText   = maid.location || 'N/A';
         document.getElementById('detailService').innerText    = maid.serviceCategory || 'N/A';
         document.getElementById('detailType').innerText       = maid.maidType === 'full-time' ? '🏠 Full Time' : '⏰ Part Time';
-
-        // ✅ Availability sirf part-time ke liye dikhao
         const availBox  = document.getElementById('detailAvailBox');
         const availText = document.getElementById('detailAvailText');
         if (maid.maidType !== 'full-time' && maid.availableFrom && maid.availableTo) {
@@ -547,31 +559,23 @@
         } else {
             availBox.style.display = 'none';
         }
-
         document.getElementById('detailModal').style.display = 'flex';
     }
 
     function closeDetailModal() { document.getElementById('detailModal').style.display = 'none'; }
 
-    // ✅ availableFrom + availableTo bhi receive karo
     function bookMaid(name, id, maidType, availFrom, availTo) {
         selectedMaid          = name;
         selectedMaidId        = id;
         selectedMaidType      = maidType || 'part-time';
         selectedMaidAvailFrom = availFrom || '';
         selectedMaidAvailTo   = availTo   || '';
-
         document.getElementById('maidNameDisplay').innerText = name;
         document.getElementById('conflictError').style.display = 'none';
-
         const isFullTime = selectedMaidType === 'full-time';
         document.getElementById('partTimeFields').style.display = isFullTime ? 'none' : 'block';
         document.getElementById('fulltimeBadge').style.display  = isFullTime ? 'block' : 'none';
-
-        // ✅ Sirf start date restrict karo
         document.getElementById('bookingDate').max = getMaxStartDate();
-
-        // ✅ Time restrict + hint
         if (!isFullTime && selectedMaidAvailFrom && selectedMaidAvailTo) {
             document.getElementById('bookingTime').min = selectedMaidAvailFrom;
             document.getElementById('bookingTime').max = selectedMaidAvailTo;
@@ -583,7 +587,6 @@
             document.getElementById('bookingTime').removeAttribute('max');
             document.getElementById('availHint').classList.remove('show');
         }
-
         document.getElementById('bookingModal').style.display = 'flex';
     }
 
@@ -616,97 +619,76 @@
 
     function onEndDateChange() {
         const startDate = document.getElementById('bookingDate').value;
-        const endDate = document.getElementById('bookingEndDate').value;
+        const endDate   = document.getElementById('bookingEndDate').value;
         if (!startDate || !endDate) return;
         const diffDays = Math.round((new Date(endDate) - new Date(startDate)) / (1000 * 60 * 60 * 24));
         if (diffDays <= 0) return;
-        const durationType = document.getElementById('durationType');
+        const durationType  = document.getElementById('durationType');
         const customWrapper = document.getElementById('customDaysWrapper');
-        const customInput = document.getElementById('customDays');
-        const diffMonths = Math.round(diffDays / 30);
-        if (diffDays === 15) { durationType.value = '15days'; customWrapper.style.display = 'none'; }
-        else if (diffMonths === 1 && diffDays <= 31) { durationType.value = '1month'; customWrapper.style.display = 'none'; }
-        else if (diffMonths === 2 && diffDays <= 62) { durationType.value = '2months'; customWrapper.style.display = 'none'; }
-        else if (diffMonths === 3 && diffDays <= 93) { durationType.value = '3months'; customWrapper.style.display = 'none'; }
+        const customInput   = document.getElementById('customDays');
+        const diffMonths    = Math.round(diffDays / 30);
+        if (diffDays === 15)                          { durationType.value = '15days';  customWrapper.style.display = 'none'; }
+        else if (diffMonths === 1 && diffDays <= 31)  { durationType.value = '1month';  customWrapper.style.display = 'none'; }
+        else if (diffMonths === 2 && diffDays <= 62)  { durationType.value = '2months'; customWrapper.style.display = 'none'; }
+        else if (diffMonths === 3 && diffDays <= 93)  { durationType.value = '3months'; customWrapper.style.display = 'none'; }
         else if (diffMonths === 6 && diffDays <= 186) { durationType.value = '6months'; customWrapper.style.display = 'none'; }
-        else if (diffMonths === 12 && diffDays <= 366) { durationType.value = '1year'; customWrapper.style.display = 'none'; }
+        else if (diffMonths === 12 && diffDays <= 366){ durationType.value = '1year';   customWrapper.style.display = 'none'; }
         else { durationType.value = 'customMonths'; customWrapper.style.display = 'block'; customInput.placeholder = 'Enter number of months e.g. 5'; customInput.value = diffMonths; }
     }
 
     function calculateEndDate() {
-        const startDate = document.getElementById('bookingDate').value;
+        const startDate    = document.getElementById('bookingDate').value;
         const durationType = document.getElementById('durationType').value;
         if (!startDate) return;
         const start = new Date(startDate);
-        if (durationType === '15days') { start.setDate(start.getDate() + 15); }
-        else if (durationType === '1month') { start.setMonth(start.getMonth() + 1); }
+        if (durationType === '15days')       { start.setDate(start.getDate() + 15); }
+        else if (durationType === '1month')  { start.setMonth(start.getMonth() + 1); }
         else if (durationType === '2months') { start.setMonth(start.getMonth() + 2); }
         else if (durationType === '3months') { start.setMonth(start.getMonth() + 3); }
         else if (durationType === '6months') { start.setMonth(start.getMonth() + 6); }
-        else if (durationType === '1year') { start.setFullYear(start.getFullYear() + 1); }
+        else if (durationType === '1year')   { start.setFullYear(start.getFullYear() + 1); }
         else if (durationType === 'customMonths') { const m = parseInt(document.getElementById('customDays').value); if (!m || m < 1) return; start.setMonth(start.getMonth() + m); }
-        else if (durationType === 'customDays') { const d = parseInt(document.getElementById('customDays').value); if (!d || d < 1) return; start.setDate(start.getDate() + d); }
+        else if (durationType === 'customDays')   { const d = parseInt(document.getElementById('customDays').value); if (!d || d < 1) return; start.setDate(start.getDate() + d); }
         else { return; }
         document.getElementById('bookingEndDate').value = start.toISOString().split('T')[0];
     }
 
     async function confirmBooking() {
-        const date       = document.getElementById('bookingDate').value;
-        const endDate    = document.getElementById('bookingEndDate').value;
+        const date         = document.getElementById('bookingDate').value;
+        const endDate      = document.getElementById('bookingEndDate').value;
         const durationType = document.getElementById('durationType').value;
-        const userEmail  = localStorage.getItem('userEmail');
-        const isFullTime = selectedMaidType === 'full-time';
-        const errDiv     = document.getElementById('conflictError');
+        const userEmail    = localStorage.getItem('userEmail');
+        const isFullTime   = selectedMaidType === 'full-time';
+        const errDiv       = document.getElementById('conflictError');
         errDiv.style.display = 'none';
-
         if (!date) return alert("Please select Start Date!");
-
-        const today = new Date();
+        const today    = new Date();
         const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-        if (date < todayStr) {
-            errDiv.innerText = "⚠️ Booking date cannot be in the past.";
-            errDiv.style.display = 'block'; return;
-        }
-
-        // ✅ Sirf start date check - next month ke 1st se aage nahi
+        if (date < todayStr) { errDiv.innerText = "⚠️ Booking date cannot be in the past."; errDiv.style.display = 'block'; return; }
         const maxStart = getMaxStartDate();
-        if (date > maxStart) {
-            errDiv.innerText = `⚠️ Start date cannot be beyond ${new Date(maxStart).toLocaleDateString()}. Please select an earlier date.`;
-            errDiv.style.display = 'block'; return;
-        }
-
+        if (date > maxStart) { errDiv.innerText = `⚠️ Start date cannot be beyond ${new Date(maxStart).toLocaleDateString()}.`; errDiv.style.display = 'block'; return; }
         if (!endDate) return alert("Please select End Date!");
-
         let time = 'Full Time', duration = 0;
         if (!isFullTime) {
             time     = document.getElementById('bookingTime').value;
             duration = parseInt(document.getElementById('duration').value);
             if (!time) return alert("Please select Start Time!");
             if (!duration || duration < 1) return alert("Please enter valid hours!");
-
             const [hours, minutes] = time.split(':').map(Number);
             const timeMins = hours * 60 + minutes;
-
-            if (timeMins < 7 * 60) {
-                errDiv.innerText = "⚠️ Booking before 7:00 AM is not allowed.";
-                errDiv.style.display = 'block'; return;
-            }
-
-            // ✅ Frontend availability check
+            if (timeMins < 7 * 60) { errDiv.innerText = "⚠️ Booking before 7:00 AM is not allowed."; errDiv.style.display = 'block'; return; }
             if (selectedMaidAvailFrom && selectedMaidAvailTo) {
                 const [fH, fM] = selectedMaidAvailFrom.split(':').map(Number);
                 const [tH, tM] = selectedMaidAvailTo.split(':').map(Number);
                 const fromMins = fH * 60 + fM;
                 const toMins   = tH * 60 + tM;
                 const endMins  = timeMins + duration * 60;
-
                 if (timeMins < fromMins || endMins > toMins) {
                     errDiv.innerText = `⚠️ This maid is only available from ${formatTime12hr(selectedMaidAvailFrom)} to ${formatTime12hr(selectedMaidAvailTo)}.`;
                     errDiv.style.display = 'block'; return;
                 }
             }
         }
-
         const response = await fetch('https://maid-easy-project.onrender.com/book', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ maidName: selectedMaid, maidId: selectedMaidId, date, time, duration, userEmail, startDate: date, endDate, durationType, maidType: selectedMaidType })
@@ -716,8 +698,17 @@
         else { alert(result.message); closeModal(); fetchMaids(); fetchNotifications(false); }
     }
 
-    function openReviewModal(name, id) { currentReviewMaidId = id; document.getElementById('reviewMaidName').innerText = name; document.getElementById('reviewModal').style.display = 'flex'; }
-    function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; document.getElementById('ratingValue').value = '5'; document.getElementById('reviewComment').value = ''; }
+    function openReviewModal(name, id) {
+        currentReviewMaidId = id;
+        document.getElementById('reviewMaidName').innerText = name;
+        document.getElementById('reviewModal').style.display = 'flex';
+    }
+
+    function closeReviewModal() {
+        document.getElementById('reviewModal').style.display = 'none';
+        document.getElementById('ratingValue').value = '5';
+        document.getElementById('reviewComment').value = '';
+    }
 
     async function submitReview() {
         const response = await fetch('https://maid-easy-project.onrender.com/add-review', {
@@ -727,6 +718,33 @@
         const result = await response.json();
         if (response.ok) { alert("Review Submitted!"); closeReviewModal(); fetchMaids(); }
         else { alert(result.message); }
+    }
+
+    // ✅ User apni pending booking cancel kar sake
+    async function cancelMyBooking(bookingId, maidName) {
+        if (!confirm(`Are you sure you want to cancel your booking for ${maidName}?`)) return;
+        const userEmail = localStorage.getItem('userEmail');
+        const res = await fetch('https://maid-easy-project.onrender.com/user/cancel-booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: bookingId, userEmail })
+        });
+        if (res.ok) {
+            await fetch('https://maid-easy-project.onrender.com/notifications/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: userEmail,
+                    type: 'booking_cancelled',
+                    message: `🚫 Your pending booking for ${maidName} has been cancelled successfully.`
+                })
+            });
+            alert("Booking cancelled successfully!");
+            fetchMaids();
+            fetchNotifications(false);
+        } else {
+            alert("Error cancelling booking. Please try again.");
+        }
     }
 
     fetchMaids();

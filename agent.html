@@ -399,120 +399,129 @@
     }
 
     async function submitMaid() {
-        resetErrors();
+    resetErrors();
 
-        const requiredFields = ['sName','sService','sSalary','sLocation','sCategory','sAge','sExperience'];
-        let hasError = false;
+    const requiredFields = ['sName','sService','sSalary','sLocation','sCategory','sAge','sExperience'];
+    let hasError = false;
 
-        requiredFields.forEach(id => {
-            const el = document.getElementById(id);
-            if (!el.value.trim()) {
-                el.classList.add('field-error');
-                const err = document.getElementById('err-' + id);
-                if (err) err.classList.add('show');
-                hasError = true;
-            }
-        });
-
-        // ✅ NEW: part-time ke liye availability validation
-        const maidType = document.getElementById('sMaidType').value;
-        if (maidType === 'part-time') {
-            const from = document.getElementById('sAvailableFrom').value;
-            const to   = document.getElementById('sAvailableTo').value;
-            if (!from) {
-                document.getElementById('err-sAvailableFrom').classList.add('show');
-                hasError = true;
-            }
-            if (!to) {
-                document.getElementById('err-sAvailableTo').classList.add('show');
-                hasError = true;
-            }
-            if (from && to && from >= to) {
-                document.getElementById('err-sAvailableTo').innerText = 'Available To must be after Available From';
-                document.getElementById('err-sAvailableTo').classList.add('show');
-                hasError = true;
-            }
-        }
-
-        const frontFile = document.getElementById('cnicFrontFile').files[0];
-        const backFile  = document.getElementById('cnicBackFile').files[0];
-        if (!frontFile) {
-            document.getElementById('frontBox').classList.add('field-error-box');
-            document.getElementById('err-cnicFront').classList.add('show');
+    requiredFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el.value.trim()) {
+            el.classList.add('field-error');
+            const err = document.getElementById('err-' + id);
+            if (err) err.classList.add('show');
             hasError = true;
         }
-        if (!backFile) {
-            document.getElementById('backBox').classList.add('field-error-box');
-            document.getElementById('err-cnicBack').classList.add('show');
+    });
+
+    // ✅ Service aur Category same honi chahiye
+    const serviceVal  = document.getElementById('sService').value.trim().toLowerCase();
+    const categoryVal = document.getElementById('sCategory').value.trim().toLowerCase();
+    if (serviceVal && categoryVal && serviceVal !== categoryVal) {
+        document.getElementById('sCategory').classList.add('field-error');
+        document.getElementById('err-sCategory').innerText = 'Category must match Service exactly';
+        document.getElementById('err-sCategory').classList.add('show');
+        hasError = true;
+    }
+
+    // ✅ part-time ke liye availability validation
+    const maidType = document.getElementById('sMaidType').value;
+    if (maidType === 'part-time') {
+        const from = document.getElementById('sAvailableFrom').value;
+        const to   = document.getElementById('sAvailableTo').value;
+        if (!from) {
+            document.getElementById('err-sAvailableFrom').classList.add('show');
             hasError = true;
         }
-
-        if (hasError) {
-            const first = document.querySelector('.field-error, .field-error-box');
-            if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return;
+        if (!to) {
+            document.getElementById('err-sAvailableTo').classList.add('show');
+            hasError = true;
         }
-
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-
-        try {
-            const { cnicFront, cnicBack } = await uploadCnicFiles();
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-
-            const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name:            document.getElementById('sName').value.trim(),
-                    service:         document.getElementById('sService').value.trim(),
-                    salary:          document.getElementById('sSalary').value.trim(),
-                    location:        document.getElementById('sLocation').value.trim(),
-                    serviceCategory: document.getElementById('sCategory').value.trim(),
-                    image:           document.getElementById('sImage').value.trim(),
-                    age:             document.getElementById('sAge').value.trim(),
-                    experience:      document.getElementById('sExperience').value.trim(),
-                    maidType,
-                    // ✅ NEW: availability fields
-                    availableFrom:   maidType === 'part-time' ? document.getElementById('sAvailableFrom').value : '',
-                    availableTo:     maidType === 'part-time' ? document.getElementById('sAvailableTo').value   : '',
-                    agentEmail,
-                    cnicFront: cnicFront || '',
-                    cnicBack:  cnicBack  || ''
-                })
-            });
-
-            const result = await res.json();
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
-
-            if (res.ok) {
-                showToast('Maid submitted successfully! Awaiting admin verification.');
-                ['sName','sService','sSalary','sLocation','sCategory','sImage','sAge','sExperience'].forEach(id => document.getElementById(id).value = '');
-                document.getElementById('sMaidType').value    = 'part-time';
-                document.getElementById('sAvailableFrom').value = '';
-                document.getElementById('sAvailableTo').value   = '';
-                document.getElementById('agentAvailabilityWrapper').classList.add('show');
-                document.getElementById('cnicFrontFile').value = '';
-                document.getElementById('cnicBackFile').value  = '';
-                document.getElementById('previewFront').style.display = 'none';
-                document.getElementById('previewBack').style.display  = 'none';
-                document.getElementById('frontBox').classList.remove('uploaded');
-                document.getElementById('backBox').classList.remove('uploaded');
-                document.getElementById('frontStatus').style.display = 'none';
-                document.getElementById('backStatus').style.display  = 'none';
-                resetErrors();
-            } else {
-                showToast(result.message || 'Submission failed.', true);
-            }
-        } catch (err) {
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
-            showToast('Server error. Please try again.', true);
+        if (from && to && from >= to) {
+            document.getElementById('err-sAvailableTo').innerText = 'Available To must be after Available From';
+            document.getElementById('err-sAvailableTo').classList.add('show');
+            hasError = true;
         }
     }
+
+    const frontFile = document.getElementById('cnicFrontFile').files[0];
+    const backFile  = document.getElementById('cnicBackFile').files[0];
+    if (!frontFile) {
+        document.getElementById('frontBox').classList.add('field-error-box');
+        document.getElementById('err-cnicFront').classList.add('show');
+        hasError = true;
+    }
+    if (!backFile) {
+        document.getElementById('backBox').classList.add('field-error-box');
+        document.getElementById('err-cnicBack').classList.add('show');
+        hasError = true;
+    }
+
+    if (hasError) {
+        const first = document.querySelector('.field-error, .field-error-box');
+        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+    try {
+        const { cnicFront, cnicBack } = await uploadCnicFiles();
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+        const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name:            document.getElementById('sName').value.trim(),
+                service:         document.getElementById('sService').value.trim(),
+                salary:          document.getElementById('sSalary').value.trim(),
+                location:        document.getElementById('sLocation').value.trim(),
+                serviceCategory: document.getElementById('sCategory').value.trim(),
+                image:           document.getElementById('sImage').value.trim(),
+                age:             document.getElementById('sAge').value.trim(),
+                experience:      document.getElementById('sExperience').value.trim(),
+                maidType,
+                availableFrom:   maidType === 'part-time' ? document.getElementById('sAvailableFrom').value : '',
+                availableTo:     maidType === 'part-time' ? document.getElementById('sAvailableTo').value   : '',
+                agentEmail,
+                cnicFront: cnicFront || '',
+                cnicBack:  cnicBack  || ''
+            })
+        });
+
+        const result = await res.json();
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
+
+        if (res.ok) {
+            showToast('Maid submitted successfully! Awaiting admin verification.');
+            ['sName','sService','sSalary','sLocation','sCategory','sImage','sAge','sExperience'].forEach(id => document.getElementById(id).value = '');
+            document.getElementById('sMaidType').value       = 'part-time';
+            document.getElementById('sAvailableFrom').value  = '';
+            document.getElementById('sAvailableTo').value    = '';
+            document.getElementById('agentAvailabilityWrapper').classList.add('show');
+            document.getElementById('cnicFrontFile').value   = '';
+            document.getElementById('cnicBackFile').value    = '';
+            document.getElementById('previewFront').style.display = 'none';
+            document.getElementById('previewBack').style.display  = 'none';
+            document.getElementById('frontBox').classList.remove('uploaded');
+            document.getElementById('backBox').classList.remove('uploaded');
+            document.getElementById('frontStatus').style.display  = 'none';
+            document.getElementById('backStatus').style.display   = 'none';
+            resetErrors();
+        } else {
+            showToast(result.message || 'Submission failed.', true);
+        }
+    } catch (err) {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
+        showToast('Server error. Please try again.', true);
+    }
+}
 
     async function loadOverview() {
         try {
