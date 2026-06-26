@@ -490,6 +490,16 @@
 
         .add-maid-btn:hover { background: #004dc7; transform: translateY(-1px); }
 
+        /* ✅ NEW: availability fields wrapper */
+        .availability-wrapper {
+            display: none;
+            grid-column: 1 / -1;
+            display: none;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .availability-wrapper.show { display: grid; }
+
         #editModal {
             display: none;
             position: fixed;
@@ -627,6 +637,7 @@
             .stat-card { padding: 14px; gap: 10px; }
             .form-grid { grid-template-columns: 1fr; padding: 16px; gap: 12px; }
             .form-group.full { grid-column: 1; }
+            .availability-wrapper { grid-template-columns: 1fr; }
             .add-maid-btn { margin: 0 16px 16px 16px; width: calc(100% - 32px); }
             .card { overflow-x: auto; }
             table { min-width: 600px; }
@@ -781,12 +792,26 @@
                         <input type="text" id="mExperience" placeholder="e.g. 3 Years">
                         <span class="field-error-msg" id="err-mExperience">Experience is required</span>
                     </div>
+                    <!-- ✅ Maid Type - onchange toggles availability fields -->
                     <div class="form-group">
                         <label>Maid Type <span class="required-star">*</span></label>
-                        <select id="mMaidType">
+                        <select id="mMaidType" onchange="toggleAvailability()">
                             <option value="part-time">⏰ Part Time</option>
                             <option value="full-time">🏠 Full Time</option>
                         </select>
+                    </div>
+                    <!-- ✅ NEW: Availability fields - sirf part-time ke liye -->
+                    <div class="availability-wrapper show" id="availabilityWrapper">
+                        <div class="form-group">
+                            <label>Available From <span class="required-star">*</span></label>
+                            <input type="time" id="mAvailableFrom">
+                            <span class="field-error-msg" id="err-mAvailableFrom">Available From is required</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Available To <span class="required-star">*</span></label>
+                            <input type="time" id="mAvailableTo">
+                            <span class="field-error-msg" id="err-mAvailableTo">Available To is required</span>
+                        </div>
                     </div>
                     <div class="form-group full">
                         <label>Maid Photo <span class="optional-tag">(optional)</span></label>
@@ -847,6 +872,7 @@
 
     </div>
 
+    <!-- EDIT MODAL -->
     <div id="editModal">
         <div class="modal-box">
             <div class="modal-header">
@@ -887,12 +913,24 @@
                     <label>Experience</label>
                     <input type="text" id="editExperience" placeholder="e.g. 3 Years">
                 </div>
+                <!-- ✅ Maid Type - onchange toggles edit availability fields -->
                 <div class="form-group">
                     <label>Maid Type</label>
-                    <select id="editMaidType">
+                    <select id="editMaidType" onchange="toggleEditAvailability()">
                         <option value="part-time">⏰ Part Time</option>
                         <option value="full-time">🏠 Full Time</option>
                     </select>
+                </div>
+                <!-- ✅ NEW: Edit availability fields -->
+                <div id="editAvailabilityWrapper">
+                    <div class="form-group">
+                        <label>Available From</label>
+                        <input type="time" id="editAvailableFrom">
+                    </div>
+                    <div class="form-group">
+                        <label>Available To</label>
+                        <input type="time" id="editAvailableTo">
+                    </div>
                 </div>
                 <button class="modal-save-btn" onclick="saveMaidEdit()">
                     <i class="fas fa-save"></i> Save Changes
@@ -935,6 +973,30 @@
             if (btn) btn.classList.add('active');
             if (name === 'maids') fetchMaids();
             if (name === 'pending') fetchPendingMaids();
+        }
+
+        // ✅ NEW: Add form - maid type change se availability toggle
+        function toggleAvailability() {
+            const type    = document.getElementById('mMaidType').value;
+            const wrapper = document.getElementById('availabilityWrapper');
+            if (type === 'part-time') {
+                wrapper.classList.add('show');
+            } else {
+                wrapper.classList.remove('show');
+                document.getElementById('mAvailableFrom').value = '';
+                document.getElementById('mAvailableTo').value   = '';
+            }
+        }
+
+        // ✅ NEW: Edit modal - maid type change se availability toggle
+        function toggleEditAvailability() {
+            const type    = document.getElementById('editMaidType').value;
+            const wrapper = document.getElementById('editAvailabilityWrapper');
+            wrapper.style.display = type === 'part-time' ? 'block' : 'none';
+            if (type === 'full-time') {
+                document.getElementById('editAvailableFrom').value = '';
+                document.getElementById('editAvailableTo').value   = '';
+            }
         }
 
         async function fetchAllBookings() {
@@ -1045,6 +1107,10 @@
 
             grid.innerHTML = maidsData.map((m, index) => {
                 const isFullTime = m.maidType === 'full-time';
+                // ✅ Format availability for display
+                const availText = (!isFullTime && m.availableFrom && m.availableTo)
+                    ? `<p><i class="fas fa-clock"></i> ${m.availableFrom} – ${m.availableTo}</p>`
+                    : '';
                 return `
                 <div class="maid-card">
                     ${m.image
@@ -1060,6 +1126,7 @@
                         <p><i class="fas fa-money-bill-wave"></i> ${m.salary || 'N/A'}</p>
                         <p><i class="fas fa-calendar-alt"></i> Age: ${m.age || 'N/A'}</p>
                         <p><i class="fas fa-briefcase"></i> Exp: ${m.experience || 'N/A'}</p>
+                        ${availText}
                         <div class="maid-card-actions">
                             <button class="edit-btn" onclick="openEditModal(${index})">
                                 <i class="fas fa-edit"></i> Edit
@@ -1132,6 +1199,8 @@
                 const err = document.getElementById('err-' + id);
                 if (err) err.classList.remove('show');
             });
+            document.getElementById('err-mAvailableFrom').classList.remove('show');
+            document.getElementById('err-mAvailableTo').classList.remove('show');
         }
 
         // ── Add Maid ──────────────────────────────────────────────────────
@@ -1153,6 +1222,26 @@
                     hasError = true;
                 }
             });
+
+            // ✅ NEW: part-time ke liye availability validation
+            const maidType = document.getElementById('mMaidType').value;
+            if (maidType === 'part-time') {
+                const from = document.getElementById('mAvailableFrom').value;
+                const to   = document.getElementById('mAvailableTo').value;
+                if (!from) {
+                    document.getElementById('err-mAvailableFrom').classList.add('show');
+                    hasError = true;
+                }
+                if (!to) {
+                    document.getElementById('err-mAvailableTo').classList.add('show');
+                    hasError = true;
+                }
+                if (from && to && from >= to) {
+                    document.getElementById('err-mAvailableTo').innerText = 'Available To must be after Available From';
+                    document.getElementById('err-mAvailableTo').classList.add('show');
+                    hasError = true;
+                }
+            }
 
             if (hasError) {
                 const first = document.querySelector('.field-error');
@@ -1176,7 +1265,10 @@
                 image:           imageValue,
                 age:             document.getElementById('mAge').value.trim(),
                 experience:      document.getElementById('mExperience').value.trim(),
-                maidType:        document.getElementById('mMaidType').value
+                maidType:        maidType,
+                // ✅ NEW: availability fields
+                availableFrom:   maidType === 'part-time' ? document.getElementById('mAvailableFrom').value : '',
+                availableTo:     maidType === 'part-time' ? document.getElementById('mAvailableTo').value   : ''
             };
 
             const res = await fetch('https://maid-easy-project.onrender.com/admin/add-maid', {
@@ -1190,8 +1282,10 @@
                 ['mName','mService','mSalary','mLocation','mCategory','mAge','mExperience'].forEach(id => {
                     document.getElementById(id).value = '';
                 });
-                document.getElementById('mImage').value = '';
-                document.getElementById('mMaidType').value = 'part-time';
+                document.getElementById('mImage').value       = '';
+                document.getElementById('mMaidType').value    = 'part-time';
+                document.getElementById('mAvailableFrom').value = '';
+                document.getElementById('mAvailableTo').value   = '';
                 clearImageUpload({ stopPropagation: () => {} });
                 resetFieldErrors();
             } else {
@@ -1201,23 +1295,30 @@
 
         function openEditModal(index) {
             const m = maidsData[index];
-            document.getElementById('editMaidId').value     = m._id;
-            document.getElementById('editName').value       = m.name || '';
-            document.getElementById('editService').value    = m.service || '';
-            document.getElementById('editSalary').value     = m.salary || '';
-            document.getElementById('editLocation').value   = m.location || '';
-            document.getElementById('editCategory').value   = m.serviceCategory || '';
-            document.getElementById('editImage').value      = m.image || '';
-            document.getElementById('editAge').value        = m.age || '';
-            document.getElementById('editExperience').value = m.experience || '';
-            document.getElementById('editMaidType').value   = m.maidType || 'part-time';
+            document.getElementById('editMaidId').value       = m._id;
+            document.getElementById('editName').value         = m.name || '';
+            document.getElementById('editService').value      = m.service || '';
+            document.getElementById('editSalary').value       = m.salary || '';
+            document.getElementById('editLocation').value     = m.location || '';
+            document.getElementById('editCategory').value     = m.serviceCategory || '';
+            document.getElementById('editImage').value        = m.image || '';
+            document.getElementById('editAge').value          = m.age || '';
+            document.getElementById('editExperience').value   = m.experience || '';
+            document.getElementById('editMaidType').value     = m.maidType || 'part-time';
+            // ✅ NEW: availability fields populate
+            document.getElementById('editAvailableFrom').value = m.availableFrom || '';
+            document.getElementById('editAvailableTo').value   = m.availableTo   || '';
+            // toggle visibility
+            const wrapper = document.getElementById('editAvailabilityWrapper');
+            wrapper.style.display = (m.maidType === 'part-time') ? 'block' : 'none';
             document.getElementById('editModal').classList.add('active');
         }
 
         function closeEditModal() { document.getElementById('editModal').classList.remove('active'); }
 
         async function saveMaidEdit() {
-            const id = document.getElementById('editMaidId').value;
+            const id       = document.getElementById('editMaidId').value;
+            const maidType = document.getElementById('editMaidType').value;
             const updatedData = {
                 id,
                 name:            document.getElementById('editName').value,
@@ -1228,7 +1329,10 @@
                 image:           document.getElementById('editImage').value,
                 age:             document.getElementById('editAge').value,
                 experience:      document.getElementById('editExperience').value,
-                maidType:        document.getElementById('editMaidType').value
+                maidType:        maidType,
+                // ✅ NEW: availability fields
+                availableFrom:   maidType === 'part-time' ? document.getElementById('editAvailableFrom').value : '',
+                availableTo:     maidType === 'part-time' ? document.getElementById('editAvailableTo').value   : ''
             };
 
             const res = await fetch('https://maid-easy-project.onrender.com/admin/update-maid', {

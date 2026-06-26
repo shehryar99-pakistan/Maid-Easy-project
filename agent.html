@@ -57,10 +57,13 @@
         .form-group input, .form-group select { padding: 11px 14px; border: 1.5px solid #e0e7ff; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--dark); background: #f8faff; outline: none; transition: 0.2s; }
         .form-group input:focus, .form-group select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(0,98,255,0.08); }
 
-        /* Validation styles */
         .form-group input.field-error { border-color: #e74c3c !important; background: #fff5f5 !important; box-shadow: 0 0 0 3px rgba(231,76,60,0.08) !important; }
         .field-error-msg { font-size: 11px; color: #e74c3c; font-weight: 600; display: none; }
         .field-error-msg.show { display: block; }
+
+        /* ✅ NEW: availability wrapper */
+        .availability-wrapper { grid-column: 1 / -1; display: none; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .availability-wrapper.show { display: grid; }
 
         .cnic-section { grid-column: 1 / -1; background: #f8faff; border: 1.5px solid #e0e7ff; border-radius: 12px; padding: 18px; }
         .cnic-section h4 { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
@@ -128,6 +131,7 @@
             .form-group.full { grid-column: 1; }
             .cnic-section { grid-column: 1; }
             .cnic-grid { grid-template-columns: 1fr; gap: 12px; }
+            .availability-wrapper { grid-template-columns: 1fr; }
             .submit-btn { margin: 0 16px 16px 16px; width: calc(100% - 32px); }
             .card { overflow-x: auto; }
             table { min-width: 550px; }
@@ -226,12 +230,27 @@
                     <input type="text" id="sExperience" placeholder="e.g. 3 Years">
                     <span class="field-error-msg" id="err-sExperience">Experience is required</span>
                 </div>
+                <!-- ✅ Maid Type - onchange toggles availability -->
                 <div class="form-group">
                     <label>Maid Type</label>
-                    <select id="sMaidType">
+                    <select id="sMaidType" onchange="toggleAgentAvailability()">
                         <option value="part-time">⏰ Part Time</option>
                         <option value="full-time">🏠 Full Time</option>
                     </select>
+                </div>
+
+                <!-- ✅ NEW: Availability fields - sirf part-time ke liye -->
+                <div class="availability-wrapper show" id="agentAvailabilityWrapper">
+                    <div class="form-group">
+                        <label>Available From <span class="required-star">*</span></label>
+                        <input type="time" id="sAvailableFrom">
+                        <span class="field-error-msg" id="err-sAvailableFrom">Available From is required</span>
+                    </div>
+                    <div class="form-group">
+                        <label>Available To <span class="required-star">*</span></label>
+                        <input type="time" id="sAvailableTo">
+                        <span class="field-error-msg" id="err-sAvailableTo">Available To is required</span>
+                    </div>
                 </div>
 
                 <div class="form-group full">
@@ -317,6 +336,19 @@
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
+    // ✅ NEW: part-time/full-time toggle for agent
+    function toggleAgentAvailability() {
+        const type    = document.getElementById('sMaidType').value;
+        const wrapper = document.getElementById('agentAvailabilityWrapper');
+        if (type === 'part-time') {
+            wrapper.classList.add('show');
+        } else {
+            wrapper.classList.remove('show');
+            document.getElementById('sAvailableFrom').value = '';
+            document.getElementById('sAvailableTo').value   = '';
+        }
+    }
+
     function handleCnicUpload(inputId, previewId, boxId, statusId, errId) {
         const file    = document.getElementById(inputId).files[0];
         const preview = document.getElementById(previewId);
@@ -352,7 +384,6 @@
         return `<span class="status-badge ${s}"><i class="fas ${icons[s] || 'fa-clock'}"></i> ${label}</span>`;
     }
 
-    // ── Validation ────────────────────────────────────────────────────────
     function resetErrors() {
         ['sName','sService','sSalary','sLocation','sCategory','sAge','sExperience'].forEach(id => {
             document.getElementById(id).classList.remove('field-error');
@@ -363,9 +394,10 @@
         document.getElementById('backBox').classList.remove('field-error-box');
         document.getElementById('err-cnicFront').classList.remove('show');
         document.getElementById('err-cnicBack').classList.remove('show');
+        document.getElementById('err-sAvailableFrom').classList.remove('show');
+        document.getElementById('err-sAvailableTo').classList.remove('show');
     }
 
-    // ── Submit Maid ───────────────────────────────────────────────────────
     async function submitMaid() {
         resetErrors();
 
@@ -382,7 +414,26 @@
             }
         });
 
-        // CNIC both sides required
+        // ✅ NEW: part-time ke liye availability validation
+        const maidType = document.getElementById('sMaidType').value;
+        if (maidType === 'part-time') {
+            const from = document.getElementById('sAvailableFrom').value;
+            const to   = document.getElementById('sAvailableTo').value;
+            if (!from) {
+                document.getElementById('err-sAvailableFrom').classList.add('show');
+                hasError = true;
+            }
+            if (!to) {
+                document.getElementById('err-sAvailableTo').classList.add('show');
+                hasError = true;
+            }
+            if (from && to && from >= to) {
+                document.getElementById('err-sAvailableTo').innerText = 'Available To must be after Available From';
+                document.getElementById('err-sAvailableTo').classList.add('show');
+                hasError = true;
+            }
+        }
+
         const frontFile = document.getElementById('cnicFrontFile').files[0];
         const backFile  = document.getElementById('cnicBackFile').files[0];
         if (!frontFile) {
@@ -408,23 +459,28 @@
 
         try {
             const { cnicFront, cnicBack } = await uploadCnicFiles();
-
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-
-            const name       = document.getElementById('sName').value.trim();
-            const service    = document.getElementById('sService').value.trim();
-            const salary     = document.getElementById('sSalary').value.trim();
-            const location   = document.getElementById('sLocation').value.trim();
-            const category   = document.getElementById('sCategory').value.trim();
-            const image      = document.getElementById('sImage').value.trim();
-            const age        = document.getElementById('sAge').value.trim();
-            const experience = document.getElementById('sExperience').value.trim();
-            const maidType   = document.getElementById('sMaidType').value;
 
             const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, service, salary, age, experience, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })
+                body: JSON.stringify({
+                    name:            document.getElementById('sName').value.trim(),
+                    service:         document.getElementById('sService').value.trim(),
+                    salary:          document.getElementById('sSalary').value.trim(),
+                    location:        document.getElementById('sLocation').value.trim(),
+                    serviceCategory: document.getElementById('sCategory').value.trim(),
+                    image:           document.getElementById('sImage').value.trim(),
+                    age:             document.getElementById('sAge').value.trim(),
+                    experience:      document.getElementById('sExperience').value.trim(),
+                    maidType,
+                    // ✅ NEW: availability fields
+                    availableFrom:   maidType === 'part-time' ? document.getElementById('sAvailableFrom').value : '',
+                    availableTo:     maidType === 'part-time' ? document.getElementById('sAvailableTo').value   : '',
+                    agentEmail,
+                    cnicFront: cnicFront || '',
+                    cnicBack:  cnicBack  || ''
+                })
             });
 
             const result = await res.json();
@@ -434,7 +490,10 @@
             if (res.ok) {
                 showToast('Maid submitted successfully! Awaiting admin verification.');
                 ['sName','sService','sSalary','sLocation','sCategory','sImage','sAge','sExperience'].forEach(id => document.getElementById(id).value = '');
-                document.getElementById('sMaidType').value = 'part-time';
+                document.getElementById('sMaidType').value    = 'part-time';
+                document.getElementById('sAvailableFrom').value = '';
+                document.getElementById('sAvailableTo').value   = '';
+                document.getElementById('agentAvailabilityWrapper').classList.add('show');
                 document.getElementById('cnicFrontFile').value = '';
                 document.getElementById('cnicBackFile').value  = '';
                 document.getElementById('previewFront').style.display = 'none';
