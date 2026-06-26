@@ -61,6 +61,7 @@ const UserSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', UserSchema);
 
+// ✅ UPDATED: availableFrom + availableTo add kiye
 const MaidSchema = new mongoose.Schema({ 
      name: String, 
      service: String, 
@@ -69,6 +70,8 @@ const MaidSchema = new mongoose.Schema({
      location: String,
      serviceCategory: String,
      maidType: { type: String, enum: ['part-time', 'full-time'], default: 'part-time' },
+     availableFrom: { type: String, default: '' },
+     availableTo:   { type: String, default: '' },
      submittedBy: { type: String, default: '' },
      verificationStatus: { type: String, enum: ['Active', 'Pending', 'Rejected'], default: 'Active' },
      rejectionReason: { type: String, default: '' },
@@ -89,7 +92,6 @@ const BookingSchema = new mongoose.Schema({
      status: { type: String, default: 'Pending' },
      startDate: { type: Date },
      endDate: { type: Date },
-     // ✅ UPDATED: naye duration types add kiye
      durationType: { type: String, enum: ['15days', '1month', '2months', '3months', '6months', '1year', 'customMonths', 'customDays', 'custom'], default: 'custom' },
      cancelReason: { type: String },
      maidType: { type: String, default: 'part-time' },
@@ -333,24 +335,29 @@ app.post('/add-review', async (req, res) => {
     }
 });
 
+// ✅ UPDATED: /book route - minutes-based conflict + availability check
 app.post('/book', async (req, res) => {
      try {
          const { maidName, maidId, date, time, duration, userEmail, durationType, startDate, endDate, maidType } = req.body;
 
-         const fromDate = new Date(startDate).toLocaleDateString();
-         const toDate   = new Date(endDate).toLocaleDateString();
+         const start = new Date(startDate);
+         const end   = new Date(endDate);
+         const fromDate = start.toLocaleDateString();
+         const toDate   = end.toLocaleDateString();
 
          if (maidType === 'full-time') {
              const conflict = await Booking.findOne({
                  maidName,
                  status: { $in: ['Pending', 'Approved'] },
-                 startDate: { $lte: new Date(endDate) },
-                 endDate:   { $gte: new Date(startDate) }
+                 startDate: { $lt: end },
+                 endDate:   { $gt: start }
              });
 
              if (conflict) {
+                 const cFrom = new Date(conflict.startDate).toLocaleDateString();
+                 const cTo   = new Date(conflict.endDate).toLocaleDateString();
                  return res.status(400).json({ 
-                     message: "⚠️ This maid is already booked for this period!" 
+                     message: `⚠️ This maid is already booked from ${cFrom} to ${cTo}. Please choose different dates.`
                  });
              }
 
@@ -359,8 +366,8 @@ app.post('/book', async (req, res) => {
                  time: 'Full Time', 
                  duration: 'Full Time', 
                  userEmail,
-                 startDate: new Date(startDate),
-                 endDate:   new Date(endDate),
+                 startDate: start,
+                 endDate:   end,
                  durationType: durationType || 'custom',
                  maidType: 'full-time',
                  paymentStatus: 'Unpaid'
@@ -375,44 +382,80 @@ app.post('/book', async (req, res) => {
              return res.status(200).json({ message: "Full-Time Booking Request Sent! ✅ Awaiting admin approval." });
          }
 
-         const startHour    = parseInt(time.split(':')[0]);
-         const durationHours = parseInt(duration);
-         const endHour      = startHour + durationHours;
+         // ── PART-TIME ──
+         if (!time || !duration) {
+             return res.status(400).json({ message: "Time and duration are required for part-time booking." });
+         }
 
-         const existingBookings = await Booking.find({ 
-             maidName,
-             status: { $in: ['Pending', 'Approved'] },
-             startDate: { $lte: new Date(endDate) },
-             endDate:   { $gte: new Date(startDate) }
-         });
+         const durationNum = parseInt(duration);
+         if (isNaN(durationNum) || durationNum < 1 || durationNum > 12) {
+             return res.status(400).json({ message: "Duration must be between 1 and 12 hours." });
+         }
 
-         let isConflict = false;
-         for (let b of existingBookings) {
-             if (!b.time || b.time === 'Full Time') continue;
-             const bStart    = parseInt(b.time.split(':')[0]);
-             const bDuration = parseInt(b.duration);
-             const bEnd      = bStart + bDuration;
-             if ((startHour < bEnd) && (endHour > bStart)) {
-                 isConflict = true;
-                 break;
+         // Helper: time string "HH:MM" → total minutes
+         const toMins = (t) => {
+             const [h, m] = t.split(':').map(Number);
+             return h * 60 + m;
+         };
+
+         const newStartMins = toMins(time);
+         const newEndMins   = newStartMins + durationNum * 60;
+
+         // ✅ Maid availability check
+         const maid = await Maid.findById(maidId);
+         if (!maid) {
+             return res.status(404).json({ message: "Maid not found." });
+         }
+
+         if (maid.availableFrom && maid.availableTo) {
+             const maidFromMins = toMins(maid.availableFrom);
+             const maidToMins   = toMins(maid.availableTo);
+
+             if (newStartMins < maidFromMins || newEndMins > maidToMins) {
+                 // Format to 12hr for user-friendly message
+                 const fmt = (t) => {
+                     const [h, m] = t.split(':').map(Number);
+                     const ampm = h >= 12 ? 'PM' : 'AM';
+                     const hr   = h % 12 || 12;
+                     return `${hr}:${String(m).padStart(2,'0')} ${ampm}`;
+                 };
+                 return res.status(400).json({ 
+                     message: `⚠️ This maid is only available from ${fmt(maid.availableFrom)} to ${fmt(maid.availableTo)}. Please select a time within this range.`
+                 });
              }
          }
-         
-         if (isConflict) {
-             return res.status(400).json({ 
-                 message: "⚠️ This maid is already booked during this time slot for the selected dates!" 
-             });
+
+         // ✅ Minutes-based conflict check
+         const overlappingByDate = await Booking.find({
+             maidName,
+             status:    { $in: ['Pending', 'Approved'] },
+             maidType:  'part-time',
+             startDate: { $lt: end   },
+             endDate:   { $gt: start }
+         });
+
+         for (const b of overlappingByDate) {
+             if (!b.time || b.time === 'Full Time') continue;
+
+             const bStartMins = toMins(b.time);
+             const bDurNum    = parseInt(b.duration); // "3 Hours" → 3
+             const bEndMins   = bStartMins + (isNaN(bDurNum) ? 0 : bDurNum) * 60;
+
+             if (newStartMins < bEndMins && newEndMins > bStartMins) {
+                 return res.status(400).json({ 
+                     message: `⚠️ Conflict! This maid is already booked from ${b.time} (${b.duration}/day) during your selected dates.`
+                 });
+             }
          }
 
-         const durationNum    = parseInt(duration);
          const durationString = durationNum === 1 ? "1 Hour" : `${durationNum} Hours`;
 
          await new Booking({ 
              maidName, date, time, 
              duration: durationString, 
              userEmail,
-             startDate: new Date(startDate),
-             endDate:   new Date(endDate),
+             startDate: start,
+             endDate:   end,
              durationType: durationType || 'custom',
              maidType: 'part-time',
              paymentStatus: 'Unpaid'
@@ -426,6 +469,7 @@ app.post('/book', async (req, res) => {
 
          res.status(200).json({ message: "Booking Request Sent! ✅ Awaiting admin approval." });
      } catch (err) { 
+         console.error('Booking error:', err);
          res.status(500).json({ error: "Booking Failed" }); 
      }
 });
@@ -525,22 +569,31 @@ app.post('/admin/cancel-booking', async (req, res) => {
     }
 });
 
+// ✅ UPDATED: availableFrom + availableTo add kiye
 app.post('/admin/add-maid', async (req, res) => {
      try {
-         const { name, service, salary, age, experience, location, serviceCategory, image, maidType } = req.body;
+         const { name, service, salary, age, experience, location, serviceCategory, image, maidType, availableFrom, availableTo } = req.body;
          await new Maid({ 
              name, service, salary, age, experience, location, serviceCategory, image, 
              maidType: maidType || 'part-time',
+             availableFrom: maidType === 'part-time' ? (availableFrom || '') : '',
+             availableTo:   maidType === 'part-time' ? (availableTo   || '') : '',
              verificationStatus: 'Active'
          }).save();
          res.status(200).json({ message: "Maid added successfully!" });
      } catch (err) { res.status(500).json({ error: "Failed to add maid" }); }
 });
 
+// ✅ UPDATED: availableFrom + availableTo add kiye
 app.post('/admin/update-maid', async (req, res) => {
     try {
-        const { id, name, service, salary, age, experience, location, serviceCategory, image, maidType } = req.body;
-        await Maid.findByIdAndUpdate(id, { name, service, salary, age, experience, location, serviceCategory, image, maidType: maidType || 'part-time' });
+        const { id, name, service, salary, age, experience, location, serviceCategory, image, maidType, availableFrom, availableTo } = req.body;
+        await Maid.findByIdAndUpdate(id, { 
+            name, service, salary, age, experience, location, serviceCategory, image, 
+            maidType: maidType || 'part-time',
+            availableFrom: maidType === 'part-time' ? (availableFrom || '') : '',
+            availableTo:   maidType === 'part-time' ? (availableTo   || '') : ''
+        });
         res.status(200).json({ message: "Maid updated successfully!" });
     } catch (err) { res.status(500).json({ error: "Update failed" }); }
 });
