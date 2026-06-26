@@ -114,9 +114,10 @@
             transition: border 0.2s;
         }
 
-        .input-group input:focus {
-            border-color: var(--primary);
-        }
+        .input-group input:focus { border-color: var(--primary); }
+        .input-group input.error { border-color: #e53935; background: #fff5f5; }
+        .error-msg { display: none; color: #e53935; font-size: 11px; margin-top: 4px; }
+        .error-msg.show { display: block; }
 
         .login-btn {
             width: 100%;
@@ -177,48 +178,16 @@
             .login-card { padding: 36px 24px; }
         }
 
-        /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 480px) {
-            .login-wrapper {
-                min-height: 100vh;
-            }
-
-            .left-panel {
-                min-height: 160px;
-            }
-
-            .login-card {
-                padding: 28px 18px;
-                max-width: 100%;
-            }
-
-            .logo-text {
-                font-size: 20px;
-            }
-
-            .logo-icon {
-                width: 34px;
-                height: 34px;
-                font-size: 17px;
-            }
-
-            .login-card h2 {
-                font-size: 18px;
-            }
-
-            .login-btn {
-                font-size: 14px;
-                padding: 11px;
-            }
-
-            .footer-links {
-                font-size: 13px;
-            }
-
-            .input-group input {
-                font-size: 13px;
-                padding: 11px 13px;
-            }
+            .login-wrapper { min-height: 100vh; }
+            .left-panel { min-height: 160px; }
+            .login-card { padding: 28px 18px; max-width: 100%; }
+            .logo-text { font-size: 20px; }
+            .logo-icon { width: 34px; height: 34px; font-size: 17px; }
+            .login-card h2 { font-size: 18px; }
+            .login-btn { font-size: 14px; padding: 11px; }
+            .footer-links { font-size: 13px; }
+            .input-group input { font-size: 13px; padding: 11px 13px; }
         }
     </style>
 </head>
@@ -241,10 +210,12 @@
                 <div class="input-group">
                     <label>Gmail Address</label>
                     <input type="email" id="email" required>
+                    <span class="error-msg" id="err-email">⚠️ Please enter your email address.</span>
                 </div>
                 <div class="input-group">
                     <label>Password</label>
                     <input type="password" id="password" required>
+                    <span class="error-msg" id="err-password">⚠️ Please enter your password.</span>
                 </div>
                 <button type="submit" class="login-btn" id="loginBtn">Login</button>
                 <p class="loading-msg" id="loadingMsg">⏳ Server starting up, please wait...</p>
@@ -264,13 +235,43 @@
     </div>
 
     <script>
+        function showError(fieldId, show) {
+            const input = document.getElementById(fieldId);
+            const err = document.getElementById('err-' + fieldId);
+            if (!input || !err) return;
+            if (show) {
+                input.classList.add('error');
+                err.classList.add('show');
+            } else {
+                input.classList.remove('error');
+                err.classList.remove('show');
+            }
+        }
+
+        function clearAllErrors() {
+            document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+            document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+        }
+
         const loginForm = document.getElementById('loginForm');
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            clearAllErrors();
+
+            const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const loginBtn = document.getElementById('loginBtn');
             const loadingMsg = document.getElementById('loadingMsg');
+
+            let hasError = false;
+
+            // Email empty check
+            if (!email) { showError('email', true); hasError = true; }
+
+            // Password empty check
+            if (!password) { showError('password', true); hasError = true; }
+
+            if (hasError) return;
 
             loginBtn.disabled = true;
             loginBtn.textContent = 'Logging in...';
@@ -306,7 +307,7 @@
                         window.location.href = "dashboard.html";
                     }
                 } else {
-                    alert(data.message || "Login Failed");
+                    alert("⚠️ Incorrect email or password. Please try again.");
                     loginBtn.disabled = false;
                     loginBtn.textContent = 'Login';
                     loadingMsg.style.display = 'none';

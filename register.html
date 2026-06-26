@@ -21,38 +21,30 @@
         .input-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #555; }
         .input-group input, .input-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; outline: none; font-size: 14px; font-family: 'Poppins', sans-serif; background: #f8faff; }
         .input-group input:focus, .input-group select:focus { border-color: var(--primary); background: white; }
+        .input-group input.error, .input-group select.error { border-color: #e53935; background: #fff5f5; }
+        .error-msg { display: none; color: #e53935; font-size: 11px; margin-top: 4px; }
+        .error-msg.show { display: block; }
         .section-divider { background: #f0f5ff; border-left: 3px solid var(--primary); padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--primary); text-align: left; margin-bottom: 12px; }
         .signup-btn { width: 100%; background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 5px; font-family: 'Poppins', sans-serif; transition: 0.3s; }
         .signup-btn:hover { background: #004dc7; }
 
-        /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 768px) {
             body { flex-direction: column; height: auto; min-height: 100vh; }
-
             .left-panel { width: 100%; height: 200px; flex: none; }
             .left-panel img { height: 200px; }
-
             .right-panel { width: 100%; min-width: unset; padding: 20px 16px; }
-
             .signup-card { padding: 24px 18px; border-radius: 16px; }
-
             .logo-text { font-size: 20px; }
-
             .input-group input, .input-group select { font-size: 13px; padding: 9px; }
-
             .signup-btn { font-size: 15px; padding: 11px; }
         }
 
         @media (max-width: 480px) {
             .left-panel { height: 150px; }
             .left-panel img { height: 150px; }
-
             .right-panel { padding: 16px 12px; }
-
             .signup-card { padding: 20px 14px; }
-
             .logo-text { font-size: 18px; }
-
             .signup-btn { font-size: 14px; }
         }
     </style>
@@ -71,12 +63,36 @@
             </div>
             <h2 style="margin:0 0 10px 0; font-size: 18px; color: #333;">Create Account</h2>
             <form id="registerForm">
-                <div class="input-group"><label>First Name</label><input type="text" name="firstName" required></div>
-                <div class="input-group"><label>Last Name</label><input type="text" name="lastName" required></div>
-                <div class="input-group"><label>Mobile Number</label><input type="text" name="mobile" required></div>
-                <div class="input-group"><label>Email Address</label><input type="email" name="email" required></div>
-                <div class="input-group"><label>Password</label><input type="password" name="password" id="password" required></div>
-                <div class="input-group"><label>Confirm Password</label><input type="password" name="confirmPassword" id="confirmPassword" required></div>
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" name="firstName" id="firstName" required>
+                    <span class="error-msg" id="err-firstName">⚠️ First name is required.</span>
+                </div>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" name="lastName" id="lastName" required>
+                    <span class="error-msg" id="err-lastName">⚠️ Last name is required.</span>
+                </div>
+                <div class="input-group">
+                    <label>Mobile Number</label>
+                    <input type="text" name="mobile" id="mobile" required>
+                    <span class="error-msg" id="err-mobile">⚠️ Mobile number must be exactly 11 digits (e.g. 03001234567).</span>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" id="email" required>
+                    <span class="error-msg" id="err-email">⚠️ Please enter a valid email address (must include @).</span>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" id="password" required>
+                    <span class="error-msg" id="err-password"></span>
+                </div>
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirmPassword" id="confirmPassword" required>
+                    <span class="error-msg" id="err-confirmPassword">⚠️ Passwords do not match!</span>
+                </div>
 
                 <div class="section-divider">🔒 Security Question (for password recovery)</div>
                 <div class="input-group">
@@ -90,10 +106,12 @@
                         <option value="What was the name of your primary school?">What was the name of your primary school?</option>
                         <option value="What is your favorite food?">What is your favorite food?</option>
                     </select>
+                    <span class="error-msg" id="err-securityQuestion">⚠️ Please select a security question.</span>
                 </div>
                 <div class="input-group">
                     <label>Security Answer</label>
                     <input type="text" name="securityAnswer" id="securityAnswer" placeholder="Your answer" required>
+                    <span class="error-msg" id="err-securityAnswer">⚠️ Please enter your security answer.</span>
                 </div>
 
                 <button type="submit" class="signup-btn">Sign Up</button>
@@ -110,21 +128,77 @@
     </div>
 
     <script>
+        function showError(fieldId, show) {
+            const input = document.getElementById(fieldId);
+            const err = document.getElementById('err-' + fieldId);
+            if (!input || !err) return;
+            if (show) {
+                input.classList.add('error');
+                err.classList.add('show');
+            } else {
+                input.classList.remove('error');
+                err.classList.remove('show');
+            }
+        }
+
+        function clearAllErrors() {
+            document.querySelectorAll('.error-msg').forEach(e => e.classList.remove('show'));
+            document.querySelectorAll('.error').forEach(e => e.classList.remove('error'));
+        }
+
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email            = e.target.email.value;
-            const mobile           = e.target.mobile.value;
-            const password         = document.getElementById('password').value;
-            const confirmPassword  = document.getElementById('confirmPassword').value;
-            const securityQuestion = document.getElementById('securityQuestion').value;
-            const securityAnswer   = document.getElementById('securityAnswer').value;
+            clearAllErrors();
 
-            if (!email.includes('@')) return alert("⚠️ Please enter a valid email address (must include @).");
-            if (mobile.length > 11)  return alert("⚠️ Mobile number must not exceed 11 digits.");
-            if (password.length < 8) return alert("⚠️ Password must be at least 8 characters long.");
-            if (password !== confirmPassword) return alert("Passwords do not match!");
-            if (!securityQuestion) return alert("⚠️ Please select a security question.");
-            if (!securityAnswer.trim()) return alert("⚠️ Please enter your security answer.");
+            const firstName      = document.getElementById('firstName').value.trim();
+            const lastName       = document.getElementById('lastName').value.trim();
+            const email          = document.getElementById('email').value.trim();
+            const mobile         = document.getElementById('mobile').value.trim();
+            const password       = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const securityQuestion = document.getElementById('securityQuestion').value;
+            const securityAnswer   = document.getElementById('securityAnswer').value.trim();
+
+            let hasError = false;
+
+            // First Name
+            if (!firstName) { showError('firstName', true); hasError = true; }
+
+            // Last Name
+            if (!lastName) { showError('lastName', true); hasError = true; }
+
+            // Email
+            if (!email.includes('@')) { showError('email', true); hasError = true; }
+
+            // Mobile: exactly 11 digits
+            if (!/^\d{11}$/.test(mobile)) { showError('mobile', true); hasError = true; }
+
+            // Password checks
+            const passErr = document.getElementById('err-password');
+            if (password.length < 8) {
+                passErr.textContent = '⚠️ Password must be at least 8 characters long.';
+                showError('password', true); hasError = true;
+            } else if (!/[A-Z]/.test(password)) {
+                passErr.textContent = '⚠️ Password must contain at least one uppercase letter (A-Z).';
+                showError('password', true); hasError = true;
+            } else if (!/[a-z]/.test(password)) {
+                passErr.textContent = '⚠️ Password must contain at least one lowercase letter (a-z).';
+                showError('password', true); hasError = true;
+            } else if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+                passErr.textContent = '⚠️ Password must contain at least one special character (!@#$%^&* etc.).';
+                showError('password', true); hasError = true;
+            }
+
+            // Confirm Password
+            if (password !== confirmPassword) { showError('confirmPassword', true); hasError = true; }
+
+            // Security Question
+            if (!securityQuestion) { showError('securityQuestion', true); hasError = true; }
+
+            // Security Answer
+            if (!securityAnswer) { showError('securityAnswer', true); hasError = true; }
+
+            if (hasError) return;
 
             const formData = {
                 firstName: e.target.firstName.value,

@@ -53,8 +53,14 @@
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         .form-group.full { grid-column: 1 / -1; }
         .form-group label { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group label .required-star { color: #e74c3c; margin-left: 3px; }
         .form-group input, .form-group select { padding: 11px 14px; border: 1.5px solid #e0e7ff; border-radius: 10px; font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--dark); background: #f8faff; outline: none; transition: 0.2s; }
         .form-group input:focus, .form-group select:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(0,98,255,0.08); }
+
+        /* Validation styles */
+        .form-group input.field-error { border-color: #e74c3c !important; background: #fff5f5 !important; box-shadow: 0 0 0 3px rgba(231,76,60,0.08) !important; }
+        .field-error-msg { font-size: 11px; color: #e74c3c; font-weight: 600; display: none; }
+        .field-error-msg.show { display: block; }
 
         .cnic-section { grid-column: 1 / -1; background: #f8faff; border: 1.5px solid #e0e7ff; border-radius: 12px; padding: 18px; }
         .cnic-section h4 { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
@@ -64,6 +70,7 @@
         .upload-box { border: 2px dashed #c0d0ff; border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: 0.3s; background: white; position: relative; }
         .upload-box:hover { border-color: var(--primary); background: #f0f5ff; }
         .upload-box.uploaded { border-color: #27ae60; border-style: solid; background: #f0faf5; }
+        .upload-box.field-error-box { border-color: #e74c3c !important; background: #fff5f5 !important; }
         .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
         .upload-box i { font-size: 28px; color: #b0c0ff; margin-bottom: 8px; display: block; }
         .upload-box.uploaded i { color: #27ae60; }
@@ -71,6 +78,8 @@
         .upload-box .upload-label { font-size: 13px; font-weight: 600; color: var(--primary); margin-bottom: 4px; }
         .upload-box.uploaded .upload-label { color: #27ae60; }
         .cnic-preview { width: 100%; height: 130px; object-fit: cover; border-radius: 8px; margin-top: 10px; display: none; border: 1px solid #d0e8d0; }
+        .cnic-err-msg { font-size: 11px; color: #e74c3c; font-weight: 600; display: none; margin-top: 4px; }
+        .cnic-err-msg.show { display: block; }
 
         .submit-btn { margin: 0 22px 22px 22px; padding: 13px; background: var(--primary); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'Poppins', sans-serif; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 44px); }
         .submit-btn:hover { background: #004dc7; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,98,255,0.3); }
@@ -102,66 +111,26 @@
 
         .rejection-box { background: #ffe8e8; border-left: 3px solid #e74c3c; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #c0392b; margin-top: 6px; }
 
-        /* ── MOBILE RESPONSIVE ── */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-                flex-direction: row;
-                flex-wrap: wrap;
-                padding: 14px 16px;
-                gap: 10px;
-            }
-
+            .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; flex-wrap: wrap; padding: 14px 16px; gap: 10px; }
             .sidebar-logo { font-size: 18px; margin-bottom: 0; }
             .sidebar-role { display: none; }
-
-            .sidebar-menu {
-                flex-direction: row;
-                flex-wrap: wrap;
-                gap: 6px;
-                width: 100%;
-            }
-
-            .menu-item {
-                flex: 1;
-                min-width: 120px;
-                padding: 8px 10px;
-                font-size: 12px;
-                justify-content: center;
-            }
-
+            .sidebar-menu { flex-direction: row; flex-wrap: wrap; gap: 6px; width: 100%; }
+            .menu-item { flex: 1; min-width: 120px; padding: 8px 10px; font-size: 12px; justify-content: center; }
             .menu-item.logout-item { margin-top: 0; }
-
-            .main {
-                margin-left: 0;
-                padding: 16px 12px;
-            }
-
-            .welcome-banner {
-                padding: 20px 18px;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 14px;
-            }
+            .main { margin-left: 0; padding: 16px 12px; }
+            .welcome-banner { padding: 20px 18px; flex-direction: column; align-items: flex-start; gap: 14px; }
             .welcome-banner h2 { font-size: 18px; }
             .welcome-banner .icon-wrap { display: none; }
-
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
             .stat-info h3 { font-size: 18px; }
-
             .form-grid { grid-template-columns: 1fr; padding: 16px; gap: 12px; }
             .form-group.full { grid-column: 1; }
             .cnic-section { grid-column: 1; }
             .cnic-grid { grid-template-columns: 1fr; gap: 12px; }
-
             .submit-btn { margin: 0 16px 16px 16px; width: calc(100% - 32px); }
-
-            /* Table scroll */
             .card { overflow-x: auto; }
             table { min-width: 550px; }
-
             .toast { bottom: 16px; right: 16px; left: 16px; font-size: 13px; }
         }
 
@@ -221,37 +190,41 @@
         <div class="card">
             <div class="card-header"><i class="fas fa-user-plus"></i><h3>Maid Details</h3></div>
             <div class="form-grid">
+
                 <div class="form-group">
-                    <label>Maid Full Name</label>
+                    <label>Maid Full Name <span class="required-star">*</span></label>
                     <input type="text" id="sName" placeholder="e.g. Fatima Bibi">
+                    <span class="field-error-msg" id="err-sName">Maid name is required</span>
                 </div>
                 <div class="form-group">
-                    <label>Service</label>
+                    <label>Service <span class="required-star">*</span></label>
                     <input type="text" id="sService" placeholder="e.g. House Cleaning">
+                    <span class="field-error-msg" id="err-sService">Service is required</span>
                 </div>
                 <div class="form-group">
-                    <label>Salary</label>
+                    <label>Salary <span class="required-star">*</span></label>
                     <input type="text" id="sSalary" placeholder="e.g. 15000 PKR/month">
+                    <span class="field-error-msg" id="err-sSalary">Salary is required</span>
                 </div>
                 <div class="form-group">
-                    <label>Location</label>
+                    <label>Location <span class="required-star">*</span></label>
                     <input type="text" id="sLocation" placeholder="e.g. Gulberg, Lahore">
+                    <span class="field-error-msg" id="err-sLocation">Location is required</span>
                 </div>
                 <div class="form-group">
-                    <label>Service Category</label>
+                    <label>Service Category <span class="required-star">*</span></label>
                     <input type="text" id="sCategory" placeholder="e.g. Cook, Cleaner, Nanny">
+                    <span class="field-error-msg" id="err-sCategory">Category is required</span>
                 </div>
                 <div class="form-group">
-                    <label>Profile Image URL</label>
-                    <input type="text" id="sImage" placeholder="Paste maid photo URL">
-                </div>
-                <div class="form-group">
-                    <label>Age</label>
+                    <label>Age <span class="required-star">*</span></label>
                     <input type="text" id="sAge" placeholder="e.g. 35">
+                    <span class="field-error-msg" id="err-sAge">Age is required</span>
                 </div>
                 <div class="form-group">
-                    <label>Experience</label>
+                    <label>Experience <span class="required-star">*</span></label>
                     <input type="text" id="sExperience" placeholder="e.g. 3 Years">
+                    <span class="field-error-msg" id="err-sExperience">Experience is required</span>
                 </div>
                 <div class="form-group">
                     <label>Maid Type</label>
@@ -261,32 +234,40 @@
                     </select>
                 </div>
 
+                <div class="form-group full">
+                    <label>Profile Image URL <span style="color:#aaa;font-size:10px;font-weight:400;text-transform:none;">(optional)</span></label>
+                    <input type="text" id="sImage" placeholder="Paste maid photo URL">
+                </div>
+
                 <!-- CNIC UPLOAD -->
                 <div class="cnic-section">
-                    <h4><i class="fas fa-id-card"></i> CNIC Documents — Upload from Gallery or Camera</h4>
+                    <h4><i class="fas fa-id-card"></i> CNIC Documents — Upload from Gallery or Camera <span class="required-star">*</span></h4>
                     <div class="cnic-grid">
                         <div>
                             <div class="upload-box" id="frontBox">
-                                <input type="file" id="cnicFrontFile" accept="image/*" onchange="handleCnicUpload('cnicFrontFile', 'previewFront', 'frontBox', 'frontStatus')">
+                                <input type="file" id="cnicFrontFile" accept="image/*" onchange="handleCnicUpload('cnicFrontFile', 'previewFront', 'frontBox', 'frontStatus', 'err-cnicFront')">
                                 <i class="fas fa-id-card"></i>
                                 <div class="upload-label">CNIC Front Side</div>
                                 <p>Tap to upload from gallery or camera</p>
                             </div>
                             <img id="previewFront" class="cnic-preview" alt="CNIC Front Preview">
                             <p id="frontStatus" style="font-size:11px;color:#27ae60;margin-top:4px;display:none;"><i class="fas fa-check"></i> Front uploaded</p>
+                            <span class="cnic-err-msg" id="err-cnicFront">CNIC front side is required</span>
                         </div>
                         <div>
                             <div class="upload-box" id="backBox">
-                                <input type="file" id="cnicBackFile" accept="image/*" onchange="handleCnicUpload('cnicBackFile', 'previewBack', 'backBox', 'backStatus')">
+                                <input type="file" id="cnicBackFile" accept="image/*" onchange="handleCnicUpload('cnicBackFile', 'previewBack', 'backBox', 'backStatus', 'err-cnicBack')">
                                 <i class="fas fa-id-card"></i>
                                 <div class="upload-label">CNIC Back Side</div>
                                 <p>Tap to upload from gallery or camera</p>
                             </div>
                             <img id="previewBack" class="cnic-preview" alt="CNIC Back Preview">
                             <p id="backStatus" style="font-size:11px;color:#27ae60;margin-top:4px;display:none;"><i class="fas fa-check"></i> Back uploaded</p>
+                            <span class="cnic-err-msg" id="err-cnicBack">CNIC back side is required</span>
                         </div>
                     </div>
                 </div>
+
             </div>
             <button class="submit-btn" id="submitBtn" onclick="submitMaid()">
                 <i class="fas fa-paper-plane"></i> Submit for Admin Verification
@@ -336,7 +317,7 @@
         setTimeout(() => toast.classList.remove('show'), 3500);
     }
 
-    function handleCnicUpload(inputId, previewId, boxId, statusId) {
+    function handleCnicUpload(inputId, previewId, boxId, statusId, errId) {
         const file    = document.getElementById(inputId).files[0];
         const preview = document.getElementById(previewId);
         const box     = document.getElementById(boxId);
@@ -346,7 +327,10 @@
         reader.onload = (e) => { preview.src = e.target.result; preview.style.display = 'block'; };
         reader.readAsDataURL(file);
         box.classList.add('uploaded');
+        box.classList.remove('field-error-box');
         status.style.display = 'block';
+        const errEl = document.getElementById(errId);
+        if (errEl) errEl.classList.remove('show');
     }
 
     async function uploadCnicFiles() {
@@ -366,6 +350,109 @@
         const icons = { active: 'fa-check-circle', pending: 'fa-clock', rejected: 'fa-times-circle' };
         const label = status === 'Active' ? 'Approved' : status;
         return `<span class="status-badge ${s}"><i class="fas ${icons[s] || 'fa-clock'}"></i> ${label}</span>`;
+    }
+
+    // ── Validation ────────────────────────────────────────────────────────
+    function resetErrors() {
+        ['sName','sService','sSalary','sLocation','sCategory','sAge','sExperience'].forEach(id => {
+            document.getElementById(id).classList.remove('field-error');
+            const err = document.getElementById('err-' + id);
+            if (err) err.classList.remove('show');
+        });
+        document.getElementById('frontBox').classList.remove('field-error-box');
+        document.getElementById('backBox').classList.remove('field-error-box');
+        document.getElementById('err-cnicFront').classList.remove('show');
+        document.getElementById('err-cnicBack').classList.remove('show');
+    }
+
+    // ── Submit Maid ───────────────────────────────────────────────────────
+    async function submitMaid() {
+        resetErrors();
+
+        const requiredFields = ['sName','sService','sSalary','sLocation','sCategory','sAge','sExperience'];
+        let hasError = false;
+
+        requiredFields.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el.value.trim()) {
+                el.classList.add('field-error');
+                const err = document.getElementById('err-' + id);
+                if (err) err.classList.add('show');
+                hasError = true;
+            }
+        });
+
+        // CNIC both sides required
+        const frontFile = document.getElementById('cnicFrontFile').files[0];
+        const backFile  = document.getElementById('cnicBackFile').files[0];
+        if (!frontFile) {
+            document.getElementById('frontBox').classList.add('field-error-box');
+            document.getElementById('err-cnicFront').classList.add('show');
+            hasError = true;
+        }
+        if (!backFile) {
+            document.getElementById('backBox').classList.add('field-error-box');
+            document.getElementById('err-cnicBack').classList.add('show');
+            hasError = true;
+        }
+
+        if (hasError) {
+            const first = document.querySelector('.field-error, .field-error-box');
+            if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+        try {
+            const { cnicFront, cnicBack } = await uploadCnicFiles();
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+
+            const name       = document.getElementById('sName').value.trim();
+            const service    = document.getElementById('sService').value.trim();
+            const salary     = document.getElementById('sSalary').value.trim();
+            const location   = document.getElementById('sLocation').value.trim();
+            const category   = document.getElementById('sCategory').value.trim();
+            const image      = document.getElementById('sImage').value.trim();
+            const age        = document.getElementById('sAge').value.trim();
+            const experience = document.getElementById('sExperience').value.trim();
+            const maidType   = document.getElementById('sMaidType').value;
+
+            const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, service, salary, age, experience, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })
+            });
+
+            const result = await res.json();
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
+
+            if (res.ok) {
+                showToast('Maid submitted successfully! Awaiting admin verification.');
+                ['sName','sService','sSalary','sLocation','sCategory','sImage','sAge','sExperience'].forEach(id => document.getElementById(id).value = '');
+                document.getElementById('sMaidType').value = 'part-time';
+                document.getElementById('cnicFrontFile').value = '';
+                document.getElementById('cnicBackFile').value  = '';
+                document.getElementById('previewFront').style.display = 'none';
+                document.getElementById('previewBack').style.display  = 'none';
+                document.getElementById('frontBox').classList.remove('uploaded');
+                document.getElementById('backBox').classList.remove('uploaded');
+                document.getElementById('frontStatus').style.display = 'none';
+                document.getElementById('backStatus').style.display  = 'none';
+                resetErrors();
+            } else {
+                showToast(result.message || 'Submission failed.', true);
+            }
+        } catch (err) {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
+            showToast('Server error. Please try again.', true);
+        }
     }
 
     async function loadOverview() {
@@ -427,62 +514,6 @@
                     </tr>`;
             }).join('');
         } catch (err) { console.error(err); }
-    }
-
-    async function submitMaid() {
-        const name       = document.getElementById('sName').value.trim();
-        const service    = document.getElementById('sService').value.trim();
-        const salary     = document.getElementById('sSalary').value.trim();
-        const location   = document.getElementById('sLocation').value.trim();
-        const category   = document.getElementById('sCategory').value.trim();
-        const image      = document.getElementById('sImage').value.trim();
-        const age        = document.getElementById('sAge').value.trim();
-        const experience = document.getElementById('sExperience').value.trim();
-        const maidType   = document.getElementById('sMaidType').value;
-
-        if (!name || !location || !category) {
-            showToast('Please fill Name, Location and Category!', true);
-            return;
-        }
-
-        const btn = document.getElementById('submitBtn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
-
-        try {
-            const { cnicFront, cnicBack } = await uploadCnicFiles();
-
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            const res = await fetch('https://maid-easy-project.onrender.com/agent/submit-maid', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, service, salary, age, experience, location, serviceCategory: category, image, maidType, agentEmail, cnicFront: cnicFront || '', cnicBack: cnicBack || '' })
-            });
-
-            const result = await res.json();
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
-
-            if (res.ok) {
-                showToast('Maid submitted successfully! Awaiting admin verification.');
-                ['sName','sService','sSalary','sLocation','sCategory','sImage','sAge','sExperience'].forEach(id => document.getElementById(id).value = '');
-                document.getElementById('sMaidType').value = 'part-time';
-                document.getElementById('cnicFrontFile').value = '';
-                document.getElementById('cnicBackFile').value  = '';
-                document.getElementById('previewFront').style.display = 'none';
-                document.getElementById('previewBack').style.display  = 'none';
-                document.getElementById('frontBox').classList.remove('uploaded');
-                document.getElementById('backBox').classList.remove('uploaded');
-                document.getElementById('frontStatus').style.display = 'none';
-                document.getElementById('backStatus').style.display  = 'none';
-            } else {
-                showToast(result.message || 'Submission failed.', true);
-            }
-        } catch (err) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit for Admin Verification';
-            showToast('Server error. Please try again.', true);
-        }
     }
 
     loadOverview();
