@@ -20,12 +20,7 @@ const Notification = require('./models/Notification');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ========== RATE LIMITER ==========
-const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 5,
-    message: { message: "Too many login attempts. Please try again after 15 minutes." }
-});
+
 
 // ========== MIDDLEWARE ==========
 app.use(cors({
@@ -104,7 +99,7 @@ app.post('/register', async (req, res) => {
      } catch (err) { res.status(500).json({ error: "Failed" }); }
 });
 
-app.post('/login', loginLimiter, async (req, res) => {
+app.post('/login', async (req, res) => {
      try {
          const { email, password } = req.body;
          const user = await User.findOne({ email });
