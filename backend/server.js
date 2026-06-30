@@ -7,17 +7,35 @@ const path = require('path');
 const cron = require('node-cron');
 const multer = require('multer');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
+const rateLimit = require('express-rate-limit');
+
+// ========== MODELS ==========
+const User = require('./models/User');
+const Maid = require('./models/Maid');
+const Booking = require('./models/Booking');
+const Review = require('./models/Review');
+const Notification = require('./models/Notification');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ========== RATE LIMITER ==========
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 5,
+    message: { message: "Too many login attempts. Please try again after 15 minutes." }
+});
+
+// ========== MIDDLEWARE ==========
 app.use(cors({
-    origin: ['https://maideasy-fyp.netlify.app',  'http://localhost:5500', 'http://127.0.0.1:5500'],
+    origin: ['https://maideasy-fyp.netlify.app', 'http://localhost:5500', 'http://127.0.0.1:5500'],
     credentials: true
 }));
 app.use(bodyParser.json({ limit: '50mb' })); 
 app.use(express.static(path.join(__dirname, 'frontend')));
 
+// ========== MULTER SETUP ==========
 const uploadDir = path.join(__dirname, 'frontend', 'uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
@@ -41,85 +59,12 @@ const upload = multer({
 
 app.use('/uploads', express.static(uploadDir));
 
+// ========== DATABASE ==========
 mongoose.connect(process.env.MONGO_URI)
      .then(() => console.log("✅ Atlas MongoDB Connected!"))
      .catch((err) => console.log("❌ Connection Error:", err));
 
-const UserSchema = new mongoose.Schema({ 
-     firstName: String, 
-     lastName: String, 
-     email: String, 
-     password: String,
-     phone: String,       
-     address: String,    
-     profilePic: String,
-     role: { type: String, default: 'user' },
-     securityQuestion: { type: String, default: '' },
-     securityAnswer:   { type: String, default: '' }
-});
-const User = mongoose.model('User', UserSchema);
-
-const MaidSchema = new mongoose.Schema({ 
-     name: String, 
-     service: String, 
-     salary: { type: String, default: '' },
-     image: String,
-     location: String,
-     serviceCategory: String,
-     maidType: { type: String, enum: ['part-time', 'full-time'], default: 'part-time' },
-     availableFrom: { type: String, default: '' },
-     availableTo:   { type: String, default: '' },
-     submittedBy: { type: String, default: '' },
-     verificationStatus: { type: String, enum: ['Active', 'Pending', 'Rejected'], default: 'Active' },
-     rejectionReason: { type: String, default: '' },
-     submittedAt: { type: Date, default: null },
-     cnicFront: { type: String, default: '' },
-     cnicBack:  { type: String, default: '' },
-     age: { type: String, default: '' },
-     experience: { type: String, default: '' }
-});
-const Maid = mongoose.model('Maid', MaidSchema, 'Maids');
-
-const BookingSchema = new mongoose.Schema({ 
-     maidName: String, 
-     date: String, 
-     time: String, 
-     duration: String, 
-     userEmail: String, 
-     status: { type: String, default: 'Pending' },
-     startDate: { type: Date },
-     endDate: { type: Date },
-     durationType: { type: String, enum: ['15days', '1month', '2months', '3months', '6months', '1year', 'customMonths', 'customDays', 'custom'], default: 'custom' },
-     cancelReason: { type: String },
-     maidType: { type: String, default: 'part-time' },
-     paymentStatus: { type: String, enum: ['Unpaid', 'Paid'], default: 'Unpaid' },
-     transactionId: { type: String, default: '' },
-     joiningDate: { type: Date, default: null } // ✅ NEW: joining date field
-}, { collection: 'bookings' }); 
-const Booking = mongoose.model('Booking', BookingSchema);
-
-const ReviewSchema = new mongoose.Schema({ 
-     maidId: { type: mongoose.Schema.Types.ObjectId, ref: 'Maid', required: true },
-     userEmail: String,
-     rating: Number,
-     comment: String,
-     createdAt: { type: Date, default: Date.now }
-});
-const Review = mongoose.model('Review', ReviewSchema);
-
-const NotificationSchema = new mongoose.Schema({
-    userEmail: { type: String, required: true },
-    message: { type: String, required: true },
-    type: { 
-        type: String, 
-        enum: ['booking_approved', 'booking_rejected', 'booking_cancelled', 'profile_updated', 'password_changed', 'phone_updated', 'photo_updated'],
-        required: true 
-    },
-    isRead: { type: Boolean, default: false },
-    createdAt: { type: Date, default: Date.now }
-});
-const Notification = mongoose.model('Notification', NotificationSchema);
-
+// ========== HELPER FUNCTION ==========
 async function saveNotification(userEmail, message, type) {
     try {
         await new Notification({ userEmail, message, type }).save();
@@ -128,6 +73,7 @@ async function saveNotification(userEmail, message, type) {
     }
 }
 
+// ========== AUTH ROUTES ==========
 app.post('/register', async (req, res) => {
      try {
          const { firstName, lastName, email, password, mobile, securityQuestion, securityAnswer } = req.body;
@@ -146,8 +92,9 @@ app.post('/register', async (req, res) => {
                  message: "An account with this email already exists. Please login instead." 
              });
          }
+         const hashedPassword = await bcrypt.hash(password, 10);
          await new User({ 
-             firstName, lastName, email, password,
+             firstName, lastName, email, password: hashedPassword,
              securityQuestion: securityQuestion || '',
              securityAnswer: securityAnswer ? securityAnswer.toLowerCase().trim() : ''
          }).save();
@@ -155,14 +102,15 @@ app.post('/register', async (req, res) => {
      } catch (err) { res.status(500).json({ error: "Failed" }); }
 });
 
-app.post('/login', async (req, res) => {
-     const { email, password } = req.body;
-     const user = await User.findOne({ email, password });
-     if (user) {
+app.post('/login', loginLimiter, async (req, res) => {
+     try {
+         const { email, password } = req.body;
+         const user = await User.findOne({ email });
+         if (!user) return res.status(401).json({ message: "Invalid credentials" });
+         const isMatch = await bcrypt.compare(password, user.password);
+         if (!isMatch) return res.status(401).json({ message: "Invalid credentials" });
          res.status(200).json({ message: "Login successful!", role: user.role });
-     } else {
-         res.status(401).json({ message: "Invalid credentials" });
-     }
+     } catch (err) { res.status(500).json({ error: "Login failed" }); }
 });
 
 app.post('/update-profile', async (req, res) => {
@@ -190,7 +138,7 @@ app.post('/update-profile', async (req, res) => {
 });
 
 app.get('/get-profile', async (req, res) => {
-    const user = await User.findOne({ email: req.query.email });
+    const user = await User.findOne({ email: req.query.email }).select('-password -securityAnswer');
     res.status(200).json(user);
 });
 
@@ -211,7 +159,8 @@ app.post('/reset-password', async (req, res) => {
         if (!user) return res.status(404).json({ message: "No account found with this email." });
         if (user.securityAnswer !== securityAnswer.toLowerCase().trim()) return res.status(400).json({ message: "❌ Security answer is incorrect." });
         if (newPassword.length < 8) return res.status(400).json({ message: "Password must be at least 8 characters long." });
-        await User.findOneAndUpdate({ email }, { password: newPassword });
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await User.findOneAndUpdate({ email }, { password: hashedPassword });
         await saveNotification(email, '🔑 Your password was reset successfully.', 'password_changed');
         res.status(200).json({ message: "Password reset successfully!" });
     } catch (err) { res.status(500).json({ error: "Reset failed" }); }
@@ -222,14 +171,17 @@ app.post('/change-password', async (req, res) => {
         const { email, currentPassword, newPassword } = req.body;
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "User not found." });
-        if (user.password !== currentPassword) return res.status(400).json({ message: "❌ Current password is incorrect." });
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) return res.status(400).json({ message: "❌ Current password is incorrect." });
         if (newPassword.length < 8) return res.status(400).json({ message: "New password must be at least 8 characters." });
-        await User.findOneAndUpdate({ email }, { password: newPassword });
+        const hashedNew = await bcrypt.hash(newPassword, 10);
+        await User.findOneAndUpdate({ email }, { password: hashedNew });
         await saveNotification(email, '🔑 Your password was changed successfully.', 'password_changed');
         res.status(200).json({ message: "Password changed successfully!" });
     } catch (err) { res.status(500).json({ error: "Change password failed" }); }
 });
 
+// ========== MAID ROUTES ==========
 app.get('/locations', async (req, res) => {
     const locations = await Maid.distinct('location');
     res.status(200).json(locations);
@@ -255,7 +207,6 @@ app.get('/maids', async (req, res) => {
                  endDate: { $gte: new Date() }
              });
          }
-         // ✅ Bookings bhi return karo taake user cancel button dekh sake
          const bookings = await Booking.find({
              maidName: maid.name,
              status: 'Pending'
@@ -306,6 +257,8 @@ app.post('/add-review', async (req, res) => {
         res.status(200).json({ message: "Review added successfully!" });
     } catch (err) { res.status(500).json({ error: "Failed to add review" }); }
 });
+
+// ========== BOOKING ROUTES ==========
 app.post('/book', async (req, res) => {
      try {
          const { maidName, maidId, date, time, duration, userEmail, durationType, startDate, endDate, maidType } = req.body;
@@ -450,7 +403,6 @@ app.get('/all-bookings', async (req, res) => {
      res.status(200).json(bookings);
 });
 
-// ✅ UPDATED: joiningDate bhi save karo, aur custom notification bhejo
 app.post('/update-booking', async (req, res) => {
      try {
          const { id, status, joiningDate } = req.body;
@@ -498,7 +450,6 @@ app.post('/admin/cancel-booking', async (req, res) => {
     } catch (err) { res.status(500).json({ error: "Cancel failed" }); }
 });
 
-// ✅ NEW: User apni pending booking cancel kar sake
 app.post('/user/cancel-booking', async (req, res) => {
     try {
         const { id, userEmail } = req.body;
@@ -511,15 +462,7 @@ app.post('/user/cancel-booking', async (req, res) => {
     } catch (err) { res.status(500).json({ error: "Cancel failed" }); }
 });
 
-// ✅ NEW: Frontend se notification add karne ka route
-app.post('/notifications/add', async (req, res) => {
-    try {
-        const { email, type, message } = req.body;
-        await saveNotification(email, message, type);
-        res.status(200).json({ success: true });
-    } catch (err) { res.status(500).json({ error: "Failed" }); }
-});
-
+// ========== ADMIN MAID ROUTES ==========
 app.post('/admin/add-maid', async (req, res) => {
      try {
          const { name, service, salary, age, experience, location, serviceCategory, image, maidType, availableFrom, availableTo } = req.body;
@@ -555,6 +498,7 @@ app.post('/admin/delete-maid', async (req, res) => {
     } catch (err) { res.status(500).json({ error: "Delete failed" }); }
 });
 
+// ========== AGENT ROUTES ==========
 app.post('/agent/upload-cnic', upload.fields([
     { name: 'cnicFront', maxCount: 1 },
     { name: 'cnicBack',  maxCount: 1 }
@@ -626,6 +570,15 @@ app.post('/admin/verify-maid', async (req, res) => {
     } catch (err) { res.status(500).json({ error: "Verification failed" }); }
 });
 
+// ========== NOTIFICATION ROUTES ==========
+app.post('/notifications/add', async (req, res) => {
+    try {
+        const { email, type, message } = req.body;
+        await saveNotification(email, message, type);
+        res.status(200).json({ success: true });
+    } catch (err) { res.status(500).json({ error: "Failed" }); }
+});
+
 app.get('/notifications', async (req, res) => {
     try {
         const { email } = req.query;
@@ -653,6 +606,7 @@ app.delete('/notifications/clear', async (req, res) => {
     } catch (err) { res.status(500).json({ error: "Failed" }); }
 });
 
+// ========== CRON JOB ==========
 cron.schedule('0 0 * * *', async () => {
     try {
         const today = new Date();
@@ -667,4 +621,5 @@ cron.schedule('0 0 * * *', async () => {
     } catch (err) { console.log('❌ Cron job error:', err); }
 });
 
+// ========== SERVER ==========
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
