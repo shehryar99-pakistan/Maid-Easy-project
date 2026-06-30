@@ -83,8 +83,9 @@ app.post('/register', async (req, res) => {
          if (mobile && mobile.length > 11) {
              return res.status(400).json({ message: "Mobile number must not exceed 11 digits." });
          }
-         if (password.length < 8) {
-             return res.status(400).json({ message: "Password must be at least 8 characters long." });
+         const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+         if (!strongPasswordRegex.test(password)) {
+             return res.status(400).json({ message: "Password must be at least 8 characters and include uppercase, lowercase, a number, and a special character." });
          }
          const existingUser = await User.findOne({ email: email });
          if (existingUser) {
@@ -95,6 +96,7 @@ app.post('/register', async (req, res) => {
          const hashedPassword = await bcrypt.hash(password, 10);
          await new User({ 
              firstName, lastName, email, password: hashedPassword,
+             phone: mobile || '',
              securityQuestion: securityQuestion || '',
              securityAnswer: securityAnswer ? securityAnswer.toLowerCase().trim() : ''
          }).save();
@@ -116,6 +118,9 @@ app.post('/login', loginLimiter, async (req, res) => {
 app.post('/update-profile', async (req, res) => {
     try {
         const { email, firstName, lastName, phone, profilePic, oldPhone, passwordChanged } = req.body;
+        if (phone && !/^\d{11}$/.test(phone)) {
+            return res.status(400).json({ message: "Mobile number must be exactly 11 digits." });
+        }
         let updateData = { firstName, lastName, phone };
         if (profilePic) updateData.profilePic = profilePic;
         await User.findOneAndUpdate({ email: email }, updateData);
@@ -158,7 +163,8 @@ app.post('/reset-password', async (req, res) => {
         const user = await User.findOne({ email });
         if (!user) return res.status(404).json({ message: "No account found with this email." });
         if (user.securityAnswer !== securityAnswer.toLowerCase().trim()) return res.status(400).json({ message: "❌ Security answer is incorrect." });
-        if (newPassword.length < 8) return res.status(400).json({ message: "Password must be at least 8 characters long." });
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!strongPasswordRegex.test(newPassword)) return res.status(400).json({ message: "New password must be at least 8 characters and include uppercase, lowercase, a number, and a special character." });
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await User.findOneAndUpdate({ email }, { password: hashedPassword });
         await saveNotification(email, '🔑 Your password was reset successfully.', 'password_changed');
@@ -173,7 +179,8 @@ app.post('/change-password', async (req, res) => {
         if (!user) return res.status(404).json({ message: "User not found." });
         const isMatch = await bcrypt.compare(currentPassword, user.password);
         if (!isMatch) return res.status(400).json({ message: "❌ Current password is incorrect." });
-        if (newPassword.length < 8) return res.status(400).json({ message: "New password must be at least 8 characters." });
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!strongPasswordRegex.test(newPassword)) return res.status(400).json({ message: "New password must be at least 8 characters and include uppercase, lowercase, a number, and a special character." });
         const hashedNew = await bcrypt.hash(newPassword, 10);
         await User.findOneAndUpdate({ email }, { password: hashedNew });
         await saveNotification(email, '🔑 Your password was changed successfully.', 'password_changed');
